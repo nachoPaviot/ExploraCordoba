@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Editar Comentario #{{ posteo.posteo_id }}</h2>
+    <hr>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.editar_posteo', posteo_id=posteo.posteo_id) }}">
+                
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título</label>
+                    <input type="text" class="form-control" id="titulo" name="titulo" 
+                           value="{{ posteo.titulo or '' }}" maxlength="150">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="contenido" class="form-label">Contenido</label>
+                    <textarea class="form-control" id="contenido" name="contenido" rows="5" required>{{ posteo.contenido }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                <a href="{{ url_for('main.foro') }}" class="btn btn-secondary">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

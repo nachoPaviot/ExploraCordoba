@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block head %}
+    {{ super() }} 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        #mapa {
+            height: 500px; /* Altura obligatoria para que el mapa se vea */
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<h1 class="mb-4">Visualización de Destinos en el Mapa</h1>
+<p>Explora la ubicación de nuestros destinos de turismo alternativo en Córdoba.</p>
+
+<div id="mapa"></div>
+
+<div class="mt-5">
+    <a href="{{ url_for('main.index') }}" class="btn btn-outline-secondary">Volver al Inicio</a>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // Inyectar la variable 'destinos' y corregir el parseo 
+    const destinos_json_str = '{{ destinos | tojson | safe }}'; 
+    let destinos_data = [];
+
+    try {
+        destinos_data = JSON.parse(destinos_json_str);
+    } catch (e) {
+        console.error("Error al parsear datos de destinos:", e);
+    }
+
+    // Coordenadas centrales de la provincia de Córdoba
+    const LAT_CORDOBA = -31.3962;
+    const LON_CORDOBA = -64.1873;
+
+    // 1. Inicializar el mapa
+    const mapa = L.map('mapa').setView([LAT_CORDOBA, LON_CORDOBA], 9); 
+
+    // 2. Agregar los "tiles" (imágenes del mapa) de OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(mapa);
+
+    // 3. Colocar marcadores en el mapa
+    destinos_data.forEach(destino => {
+        let lat = null;
+        let lon = null;
+        
+        // Asumo que tienes el formato "lat,lon" en el campo 'endpoint'
+        if (destino.endpoint && typeof destino.endpoint === 'string') {
+            const coords = destino.endpoint.split(',');
+            lat = parseFloat(coords[0]);
+            lon = parseFloat(coords[1]);
+        } 
+        
+        if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+            L.marker([lat, lon])
+            .addTo(mapa)
+            .bindPopup(`<b>${destino.nombre}</b><br>${destino.descripcion || 'Sin descripción'}`);
+        } else {
+            console.warn(`Destino '${destino.nombre}' omitido: Coordenadas no válidas o faltantes.`);
+        }
+    });
+</script>
+
+{% endblock content %}

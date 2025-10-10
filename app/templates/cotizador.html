@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Cotizador{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Cotizador de Servicios Turísticos</h2>
+    <hr>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="mb-3">Seleccione los servicios:</h4>
+            <form method="POST" action="{{ url_for('main.cotizador') }}">
+                
+                <div class="mb-3">
+                    <label for="servicio" class="form-label">Servicio a Cotizar:</label>
+                    <select class="form-select" id="servicio" name="servicio" required>
+                        <option value="" disabled selected>Selecciona un destino y servicio</option>
+                        
+                        {% for destino in destinos %}
+                            <optgroup label="Destino: {{ destino.nombre }}">
+                                {% for servicio in destino.servicios %}
+                                    <option value="{{ servicio.servicio_id }}">
+                                        {{ servicio.nombre }} (Costo: ${{ servicio.costo_base }} por {{ servicio.unidad }})
+                                    </option>
+                                {% endfor %}
+                            </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
+                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin:</label>
+                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="personas" class="form-label">Cantidad de Personas:</label>
+                    <input type="number" class="form-control" id="personas" name="personas" min="1" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Cotizar Ahora</button>
+            </form>
+        </div>
+
+        <div class="col-md-6">
+            <h4 class="mb-3">Resultado de la Cotización</h4>
+            {% if cotizacion_resultado %}
+                <div class="card p-3 shadow">
+                    {% if cotizacion_resultado.error %}
+                        <div class="alert alert-danger">{{ cotizacion_resultado.error }}</div>
+                    {% else %}
+                        <h5 class="card-title text-success">Costo Calculado</h5>
+                        <p><strong>Destino:</strong> {{ cotizacion_resultado.destino }}</p>
+                        <p><strong>Servicio:</strong> {{ cotizacion_resultado.servicio }}</p>
+                        <p><strong>Costo Base:</strong> ${{ cotizacion_resultado.costo_base }} / {{ cotizacion_resultado.dias }} {{ 'días' if cotizacion_resultado.dias > 1 else 'día' }}</p>
+                        <p><strong>Personas:</strong> {{ cotizacion_resultado.personas }}</p>
+                        <hr>
+                        <h4>Costo Total Estimado: <span class="text-primary">${{ "{:,.2f}".format(cotizacion_resultado.total) }}</span></h4>
+                        <p class="text-muted small mt-2">Cotización guardada como "{{ cotizacion_resultado.estado }}".</p>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">Ingresa los detalles de tu viaje y haz clic en "Cotizar Ahora" para ver el costo.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

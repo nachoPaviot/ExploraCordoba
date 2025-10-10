@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Foro de Viajeros</h2>
+
+    {% if current_user.is_authenticated and current_user.rol_id == 5 %}
+    <div class="card mb-4">
+        <div class="card-header">
+            Publicar un nuevo comentario
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('main.foro') }}">
+                <div class="form-group mb-3">
+                    <input type="text" class="form-control" name="titulo" placeholder="Título del Post (Opcional)" maxlength="150">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" name="contenido" rows="3" placeholder="Escribe tu comentario aquí..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Publicar</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <h3 class="mb-3">Comentarios Recientes</h3>
+    {% if posteos %}
+        {% for post in posteos %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <p class="card-text">{{ post.contenido }}</p>
+                {% if current_user.usuario_id == post.usuario_id or current_user.rol_id in [1, 2] %}
+                    <a href="{{ url_for('main.editar_posteo', posteo_id=post.posteo_id) }}" 
+                        class="btn btn-info btn-sm float-end me-2">
+                        Editar
+                    </a>
+            
+                    <form action="{{ url_for('main.eliminar_posteo', posteo_id=post.posteo_id) }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm float-end" 
+                                onclick="return confirm('¿Estás seguro de que quieres eliminar este comentario?');">
+                            Eliminar
+                        </button>
+                    </form>
+                {% endif %}
+                <footer class="blockquote-footer mt-2">
+                    Publicado por 
+                    <cite title="Autor">{{ post.autor.nombre }} {{ post.autor.apellido }}</cite> 
+                    el {{ post.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                </footer>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>Aún no hay comentarios en el foro. ¡Sé el primero en publicar!</p>
+    {% endif %}
+
+</div>
+{% endblock %}
