@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from .extensions import db, login_manager
+
+# Modelo: Rol
 class Rol(db.Model):
     # tabla 'rol' en la base de datos
     __tablename__ = 'rol' 
@@ -14,7 +16,7 @@ class Rol(db.Model):
     def __repr__(self):
         return f'<Rol {self.n_rol}>'
 
-# UserMixin para usar Flask-Login
+# Modelo: Usuario
 class Usuario(db.Model, UserMixin): 
     __tablename__ = 'usuario'
     usuario_id = db.Column(db.Integer, primary_key=True)
@@ -105,7 +107,8 @@ class Cotizacion(db.Model):
 
     def __repr__(self):
         return f'<Cotizacion ID {self.cotizacion_id}>'
-
+    
+# Modelo: Posteo
 class Posteo(db.Model):
     """Modelo para los comentarios del foro o posts."""
     __tablename__ = 'posteo'

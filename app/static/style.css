@@ -1,0 +1,62 @@
+/*Estilos del Cuerpo y Fondo*/
+body {
+    background-image: url('imagenFondo.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center center;
+    
+    /* El color oscuro permite que el texto blanco sea legible */
+    background-color: rgba(0, 0, 0, 0.5); /* Color de respaldo por si no carga */
+    background-blend-mode: darken;
+    
+    /* Asegura que el texto sea por defecto blanco */
+    color: #f8f9fa; 
+}
+/*Superposición del Contenido*/
+.main-content-wrapper {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+    color: #212529;
+}
+/* Estilos adicionales */
+.navbar {
+    border-bottom: 3px solid #007bff; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* estilo para botones*/
+.btn-custom {
+    background-color: #f8c000;
+    border-color: #f8c000;
+    color: #212529;
+}
+.btn-custom:hover {
+    background-color: #d1a400;
+    border-color: #d1a400;
+}
+
+.banner-transparente {
+    background-color: rgba(248, 249, 250, 0.3); /* 30% de opacidad y 70 transparencia */
+    color: #212529; 
+}
+
+.tarjeta-transparente {
+    background-color: rgba(255, 255, 255, 0.3); /* 30% de opacidad y 70 transparencia */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Mantener elementos ocultos */
+.fade-in-elemento {
+    opacity: 0; /* Totalmente oculto */
+    transform: translateY(20px);
+    transition: opacity 10s ease-out, transform 0.8s ease-out; /*duración de la transición */
+}
+
+/* Hacer elementos visibles */
+.fade-in-elemento.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}

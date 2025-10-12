@@ -10,7 +10,7 @@ main = Blueprint('main', __name__)
 # ruta raíz
 @main.route('/')
 def index():
-    return render_template('base.html')
+    return render_template('index.html')
 
 @main.route('/registro', methods=['GET', 'POST'])
 def registro():

@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
         #mapa {
-            height: 500px; /* Altura obligatoria para que el mapa se vea */
+            height: 500px;
             width: 100%;
         }
     </style>
@@ -53,7 +53,6 @@
         let lat = null;
         let lon = null;
         
-        // Asumo que tienes el formato "lat,lon" en el campo 'endpoint'
         if (destino.endpoint && typeof destino.endpoint === 'string') {
             const coords = destino.endpoint.split(',');
             lat = parseFloat(coords[0]);

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+
+
+<header class="p-5 text-center banner-transparente rounded-3 shadow mb-5 fade-in-elemento" id="home-banner">
+    <h1 class="display-4">¡Explora Córdoba!</h1>
+    <p class="lead">Descubrí los mejores destinos, servicios e intercambios en nuestra comunidad.</p>
+    <a href="#atajos" class="btn btn-primary btn-lg mt-3">Comenzar a Explorar ↓</a>
+</header>
+
+<section id="atajos" class="mt-5">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+
+        <div class="col">
+            <div class="card h-100 shadow-sm text-center tarjeta-transparente fade-in-elemento">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Foro de Viajeros 💬</h5>
+                    <p class="card-text">Compartí tus experiencias, haz preguntas...</p>
+                    <a href="{{ url_for('main.foro') }}" class="btn btn-outline-primary mt-2">Ir al Foro</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="card h-100 shadow-sm text-center tarjeta-transparente fade-in-elemento">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">cotizador 💬</h5>
+                    <p class="card-text">Compartí tus experiencias, haz preguntas...</p>
+                    <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Foro</a>
+                </div>
+            </div>
+        </div>
+
+        </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const elementos = document.querySelectorAll('.fade-in-elemento');
+        let retrasoBase = 1000; // Retraso inicial 1 segundo
+
+        elementos.forEach((elemento, indice) => {
+            // Incrementa el retraso de cada elemento
+            const retraso = retrasoBase + (indice * 200); 
+
+            setTimeout(() => {
+                elemento.classList.add('mostrar');
+            }, retraso);
+        });
+    });
+</script>
+{% endblock %}

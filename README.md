@@ -7,18 +7,18 @@ Aplicación que permite a los usuarios compartir, descubrir y debatir sobre dest
 3. **Git** para clonar el repositorio desde GitHub.
 
 # Configuración inicial
+### Clonar la aplicacion desde GitHub
+	git clone https://github.com/nachoPaviot/ExploraCordoba.git
+
 ### Crear entorno virtual de Flask 
     python -m venv venv
-
-### Instalar dependecias
-	pip install -r requirements.txt
 
 ### Activar el entorno virtual de Flask
 - **En Windows:** ``tu directorio raíz\venv\Scripts\activate``
 - **En Linux/macOS:** ``source venv/bin/activate``
 
-### Clonar la aplicacion desde GitHub
-	git clone https://github.com/nachoPaviot/ExploraCordoba.git
+### Instalar dependecias
+	pip install -r requerimientos.txt
 
 ## Configuración para correr la aplicación
 ### Setear la variable de inicio
@@ -37,3 +37,7 @@ La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
 
 ### Crear datos de prueba en la Base de Datos
 	flask sembrar_db
+
+###Usuarios de prueba
+1. Usuario: *turista@prueba.com* Contraseña: *admin*
+2. Usuario: *admin@prueba.com* Contraseña: *admin*

@@ -37,7 +37,7 @@
             
                     <form action="{{ url_for('main.eliminar_posteo', posteo_id=post.posteo_id) }}" method="POST" style="display: inline;">
                         <button type="submit" class="btn btn-danger btn-sm float-end" 
-                                onclick="return confirm('¿Estás seguro de que quieres eliminar este comentario?');">
+                                onclick="return confirm('¿Estás seguro de eliminar este comentario?');">
                             Eliminar
                         </button>
                     </form>
@@ -51,7 +51,7 @@
         </div>
         {% endfor %}
     {% else %}
-        <p>Aún no hay comentarios en el foro. ¡Sé el primero en publicar!</p>
+        <p>Aún no hay comentarios en el foro. ¡Publica vos primero!</p>
     {% endif %}
 
 </div>
