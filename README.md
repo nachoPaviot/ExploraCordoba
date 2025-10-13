@@ -14,16 +14,20 @@ Aplicación que permite a los usuarios compartir, descubrir y debatir sobre dest
     python -m venv venv
 
 ### Activar el entorno virtual de Flask
-- **En Windows:** ``tu directorio raíz\venv\Scripts\activate``
-- **En Linux/macOS:** ``source venv/bin/activate``
+- **En Windows:** 
+	tu directorio raíz\venv\Scripts\activate
+- **En Linux/macOS:** 
+	source venv/bin/activate
 
 ### Instalar dependecias
 	pip install -r requerimientos.txt
 
 ## Configuración para correr la aplicación
 ### Setear la variable de inicio
-- **En Windows:** ``set FLASK_APP=app.app``
-- **En Linux/macOS:** ``export FLASK_APP=app.app``
+- **En Windows:** 
+	set FLASK_APP=app
+- **En Linux/macOS:** 
+	export FLASK_APP=app
 
 ### Correr el servidor
 	flask run
@@ -38,6 +42,6 @@ La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
 ### Crear datos de prueba en la Base de Datos
 	flask sembrar_db
 
-###Usuarios de prueba
-1. Usuario: *turista@prueba.com* Contraseña: *admin*
-2. Usuario: *admin@prueba.com* Contraseña: *admin*
+### Usuarios de prueba
+1. Usuario: **turista@prueba.com** Contraseña: **turista**
+2. Usuario: **admin@prueba.com** Contraseña: **admin**

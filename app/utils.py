@@ -1,5 +1,4 @@
-from flask_sqlalchemy import SQLAlchemy
-from .extensions import db, bcrypt, login_manager
+from .extensions import db, bcrypt
 from functools import wraps
 from flask import abort, current_app, flash
 from sqlalchemy import text
@@ -11,7 +10,7 @@ def reset_sequence(db_instance, table_name, id_column):
     sql_command = f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;"
     # Si la tabla tiene claves foráneas (como Cotizacion), TRUNCATE CASCADE es mejor.
     # Si la tabla NO tiene FKs, simplemente 'TRUNCATE TABLE {table_name} RESTART IDENTITY;'
-    # Usaremos el comando más seguro y directo que funciona en muchos DBs:
+    # el comando más seguro y directo que funciona en muchos DBs:
     # db_instance.session.execute(text(f"TRUNCATE TABLE {table_name} RESTART IDENTITY CASCADE;"))
     # O el que ya usamos que requiere solo DELETE y setval si la tabla no se autoincrementa
     db_instance.session.execute(text(f"SELECT setval('{table_name}_{id_column}_seq', 1, false);"))
@@ -124,8 +123,6 @@ def register_cli_commands(app):
                     unidad = 'Noche',
                     destino_id=2
                 )
-
-                # 5. Cotizaciones
                 
                 db.session.add_all([rol_admin, 
                                     rol_turista, 
@@ -162,8 +159,6 @@ def register_cli_commands(app):
                 db.session.commit()
                 print("¡Datos iniciales y secuencias insertadas correctamente!")
 
-                print("¡Datos iniciales insertados correctamente!")
-
             except Exception as e:
                 db.session.rollback()
                 print(f"Error al insertar datos iniciales: {e}")
@@ -183,11 +178,9 @@ def post_permission_required(f):
             raise Exception("Ruta mal configurada. El decorador requiere 'posteo_id' en la URL.")
         
         posteo = Posteo.query.get_or_404(posteo_id)
-        # 1. Leer los IDs de la configuración
         admin_rol_id = current_app.config.get('ROL_ADMIN_ID', 1) 
         moderador_rol_id = current_app.config.get('ROL_MODERADOR_ID', 2)
         
-        # 2. Lógica de Permisos
         autor = current_user.usuario_id == posteo.usuario_id
         admin_o_moderador = current_user.rol_id in [admin_rol_id, moderador_rol_id]
 

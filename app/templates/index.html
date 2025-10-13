@@ -6,7 +6,7 @@
 
 <header class="p-5 text-center banner-transparente rounded-3 shadow mb-5 fade-in-elemento" id="home-banner">
     <h1 class="display-4">¡Explora Córdoba!</h1>
-    <p class="lead">Descubrí los mejores destinos, servicios e intercambios en nuestra comunidad.</p>
+    <p class="lead">Descubrí los mejores destinos, servicios y debates en nuestra comunidad.</p>
     <a href="#atajos" class="btn btn-primary btn-lg mt-3">Comenzar a Explorar ↓</a>
 </header>
 
@@ -17,7 +17,7 @@
             <div class="card h-100 shadow-sm text-center tarjeta-transparente fade-in-elemento">
                 <div class="card-body">
                     <h5 class="card-title text-primary">Foro de Viajeros 💬</h5>
-                    <p class="card-text">Compartí tus experiencias, haz preguntas...</p>
+                    <p class="card-text">Compartí tus experiencias o pregunta lo que quieras...</p>
                     <a href="{{ url_for('main.foro') }}" class="btn btn-outline-primary mt-2">Ir al Foro</a>
                 </div>
             </div>
@@ -26,14 +26,13 @@
         <div class="col">
             <div class="card h-100 shadow-sm text-center tarjeta-transparente fade-in-elemento">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">cotizador 💬</h5>
-                    <p class="card-text">Compartí tus experiencias, haz preguntas...</p>
-                    <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Foro</a>
+                    <h5 class="card-title text-primary">Cotizador 💬</h5>
+                    <p class="card-text">Armá el presupuesto para tu próxima aventura</p>
+                    <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Cotizador</a>
                 </div>
             </div>
         </div>
-
-        </div>
+    </div>
 </section>
 
 {% endblock %}
