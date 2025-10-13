@@ -43,7 +43,7 @@ def registro():
 
         except Exception as e:
             db.session.rollback()
-            flash(f'Error al registrar el usuario: {e}', 'danger')
+            flash(f'Error en el registro. Ya existe el usuario', 'danger')
     
     return render_template('registro.html', title='Registro')
 

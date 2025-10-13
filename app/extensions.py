@@ -10,7 +10,7 @@ login_manager = LoginManager()
 # Configuración de LoginManager
 login_manager.login_view = 'main.login' 
 login_manager.login_message_category = 'info' 
-login_manager.login_message = 'Por favor, inicie sesión para acceder al mapa.'
+login_manager.login_message = 'Por favor, inicie sesión para acceder a esta página.'
 
 @login_manager.user_loader
 def load_user(user_id):

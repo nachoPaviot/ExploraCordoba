@@ -1,5 +1,6 @@
 # Descripción
-Aplicación que permite a los usuarios compartir, descubrir y debatir sobre destinos turísticos en la provincia de Córdoba. Orientada a un público avido por descubrir nuevos destinos deslumbrantes.
+Aplicación que permite a los usuarios compartir, descubrir y debatir sobre destinos turísticos en la provincia de Córdoba. Orientada a un público ávido por descubrir nuevos destinos deslumbrantes.
+El stack tecnológico esta conformado por el framework Flask, con Python para el backend y Bootstrap, Jinja2, Html, Css, para el frontend. Mientras que los datos se persiten en PostreSQL.
 
 # Requisitos 
 1. **Python 3.8+** instalado en tu sistema
@@ -14,9 +15,9 @@ Aplicación que permite a los usuarios compartir, descubrir y debatir sobre dest
     python -m venv venv
 
 ### Activar el entorno virtual de Flask
-- **En Windows:** 
+###### En Windows:
 	tu directorio raíz\venv\Scripts\activate
-- **En Linux/macOS:** 
+###### En Linux/macOS:
 	source venv/bin/activate
 
 ### Instalar dependecias
@@ -24,9 +25,9 @@ Aplicación que permite a los usuarios compartir, descubrir y debatir sobre dest
 
 ## Configuración para correr la aplicación
 ### Setear la variable de inicio
-- **En Windows:** 
+###### En Windows: 
 	set FLASK_APP=app
-- **En Linux/macOS:** 
+###### En Linux/macOS: 
 	export FLASK_APP=app
 
 ### Correr el servidor
@@ -43,5 +44,5 @@ La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
 	flask sembrar_db
 
 ### Usuarios de prueba
-1. Usuario: **turista@prueba.com** Contraseña: **turista**
-2. Usuario: **admin@prueba.com** Contraseña: **admin**
+1. Usuario: ```turista@prueba.com``` Contraseña: ```turista```
+2. Usuario: ```admin@prueba.com``` Contraseña: ```admin```
