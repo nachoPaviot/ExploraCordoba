@@ -41,9 +41,37 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
+# Decorador de la librería wraps para verificar permisos sobre un posteo
+def post_permission_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            flash('Necesitas iniciar sesión para gestionar contenido.', 'warning')
+            return abort(403)
+        
+        from .models import Posteo
+        # La función de vista debe pasar el objeto Posteo como argumento        
+        posteo_id = kwargs.get('posteo_id')
+        if posteo_id is None:
+            raise Exception("Ruta mal configurada")
+        
+        posteo = Posteo.query.get_or_404(posteo_id)
+        admin_rol_id = current_app.config.get('ROL_ADMIN_ID', 1) 
+        moderador_rol_id = current_app.config.get('ROL_MODERADOR_ID', 2)
+        
+        autor = current_user.usuario_id == posteo.usuario_id
+        admin_o_moderador = current_user.rol_id in [admin_rol_id, moderador_rol_id]
+
+        if not (autor or admin_o_moderador):
+            flash('No tenés permiso para eliminar este comentario.', 'danger')
+            abort(403)
+        kwargs['posteo'] = posteo  # Pasa el posteo para la función decorada   
+
+        return f(*args, **kwargs)
+    return decorated_function
+
 # comandos CLI para crear y sembrar la base de datos
 def register_cli_commands(app):
-    """Registra los comandos 'crear_db' y 'sembrar_db' en la aplicación."""
     from .models import Rol, Usuario, Destino, Servicio, Cotizacion
     
     #Crea la base de datos y las tablas
@@ -69,11 +97,11 @@ def register_cli_commands(app):
             try:
                 # Datos de Ejemplo
                 # 1. Roles 
-                rol_admin = Rol(rol_id=1, n_rol='Administrador', descripcion='Acceso total a la administración.')
-                rol_moderador = Rol(rol_id=2, n_rol='Moderador', descripcion='Puede gestionar contenidos y usuarios.')
-                rol_mesa_ayuda = Rol(rol_id=3, n_rol='Mesa de Ayuda', descripcion='Atiende consultas y soporte.')
-                rol_proveedor = Rol(rol_id=4, n_rol='Proveedor de Servicios', descripcion='Gestiona sus propios servicios y destinos.')
-                rol_turista = Rol(rol_id=5, n_rol='Usuario Turista', descripcion='...')
+                rol_admin = Rol(rol_id=1, nombre='Administrador', descripcion='Acceso total a la administración.')
+                rol_moderador = Rol(rol_id=2, nombre='Moderador', descripcion='Puede gestionar contenidos.')
+                rol_mesa_ayuda = Rol(rol_id=3, nombre='Mesa de Ayuda', descripcion='Atiende consultas y soporte.')
+                rol_proveedor = Rol(rol_id=4, nombre='Proveedor', descripcion='Gestiona sus propios servicios.')
+                rol_turista = Rol(rol_id=5, nombre='Turista', descripcion='Usuario estándar que puede ver destinos, servicios, solicitar cotizaciones y participar en el foro.')
                 
                 # 2. Usuarios
                 #Admin
@@ -124,7 +152,10 @@ def register_cli_commands(app):
                     destino_id=2
                 )
                 
-                db.session.add_all([rol_admin, 
+                db.session.add_all([rol_admin,
+                                    rol_moderador, 
+                                    rol_mesa_ayuda, 
+                                    rol_proveedor,
                                     rol_turista, 
                                     user_admin,
                                     user_turista, 
@@ -162,32 +193,3 @@ def register_cli_commands(app):
             except Exception as e:
                 db.session.rollback()
                 print(f"Error al insertar datos iniciales: {e}")
-
-# Decorador de la librería wraps para verificar permisos sobre un posteo
-def post_permission_required(f):
-    """
-    Decorador que verifica si el usuario es el autor, admin o moderador.
-    Debe pasarse el posteo como argumento 'posteo'.
-    """
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        from .models import Posteo
-        # La función de vista debe pasar el objeto Posteo como argumento
-        posteo_id = kwargs.get('posteo_id')
-        if posteo_id is None:
-            raise Exception("Ruta mal configurada. El decorador requiere 'posteo_id' en la URL.")
-        
-        posteo = Posteo.query.get_or_404(posteo_id)
-        admin_rol_id = current_app.config.get('ROL_ADMIN_ID', 1) 
-        moderador_rol_id = current_app.config.get('ROL_MODERADOR_ID', 2)
-        
-        autor = current_user.usuario_id == posteo.usuario_id
-        admin_o_moderador = current_user.rol_id in [admin_rol_id, moderador_rol_id]
-
-        if not (autor or admin_o_moderador):
-            flash('No tenés permiso para eliminar ni editar este comentario.', 'danger')
-            abort(403)
-        kwargs['posteo'] = posteo  # Pasa el posteo para la función decorada   
-
-        return f(*args, **kwargs)
-    return decorated_function

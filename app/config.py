@@ -1,6 +1,0 @@
-#Constantes para los roles de usuario.
-ROL_ADMIN_ID = 1
-ROL_MODERADOR_ID = 2
-ROL_MESA_AYUDA_ID = 3
-ROL_PROVEEDOR_ID = 4
-ROL_TURISTA_ID = 5

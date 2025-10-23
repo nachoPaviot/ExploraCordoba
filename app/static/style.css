@@ -39,12 +39,12 @@ body {
 }
 
 .banner-transparente {
-    background-color: rgba(248, 249, 250, 0.3); /* 30% de opacidad y 70 transparencia */
+    background-color: rgba(248, 249, 250, 0.4); /* 40% de opacidad y 60 transparencia */
     color: #212529; 
 }
 
 .tarjeta-transparente {
-    background-color: rgba(255, 255, 255, 0.3); /* 30% de opacidad y 70 transparencia */
+    background-color: rgba(255, 255, 255, 0.4); /* 40% de opacidad y 60 transparencia */
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 

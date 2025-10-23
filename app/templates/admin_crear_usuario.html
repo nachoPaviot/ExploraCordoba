@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Crear Nuevo Usuario</h2>
+        <a href="{{ url_for('main.admin_panel') }}" class="btn btn-secondary">
+            ← Volver al Panel
+        </a>
+    </div>
+    <hr>
+
+    <div class="card p-4">
+        <form method="POST" action="{{ url_for('main.crear_usuario') }}">
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="nombre" class="form-label">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" 
+                        value="{{ form_data.nombre }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="apellido" class="form-label">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" 
+                        value="{{ form_data.apellido }}" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" 
+                    value="{{ form_data.email }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="rol_id" class="form-label">Rol</label>
+                <select class="form-select" id="rol_id" name="rol_id" required>
+                    {{ rol_options_html | safe }}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear Usuario</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

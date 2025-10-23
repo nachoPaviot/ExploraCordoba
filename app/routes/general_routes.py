@@ -75,5 +75,5 @@ def login():
 @login_required # Solo usuarios logeados pueden acceder
 def logout():
     logout_user()
-    flash('Has cerrado sesión exitosamente.', 'success')
+    flash('Has cerrado sesión.', 'info')
     return redirect(url_for('main.index'))

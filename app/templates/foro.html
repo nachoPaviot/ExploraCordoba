@@ -1,58 +1,139 @@
 {% extends "base.html" %}
 
+{% macro render_posteos(posteos_list) %}
+    {% for post in posteos_list %}
+        <div class="card mb-3 {% if post.posteo_padre_id %}ms-5 border-start border-secondary border-2{% endif %} post-card">
+            <div class="card-body">
+                {% if post.titulo and not post.posteo_padre_id %}
+                    <h5 class="card-title">{{ post.titulo }}</h5>
+                {% endif %}
+
+                <p class="card-text">{{ post.contenido }}</p>
+
+                <footer class="blockquote-footer mt-2">
+                    Publicado por 
+                    <cite title="Autor">{{ post.autor.nombre }} {{ post.autor.apellido }}</cite> 
+                    el {{ post.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
+                    {% if post.posteo_padre_id %} (Respuesta){% endif %}
+                </footer>
+                
+                <div class="mt-2 d-flex justify-content-end align-items-center">
+                    
+                    {% if current_user.is_authenticated %}
+                    <button type="button" 
+                            class="btn btn-sm btn-link text-decoration-none me-auto btn-reply" 
+                            data-parent-id="{{ post.posteo_id }}"
+                            data-parent-author="{{ post.autor.nombre }}">
+                        Responder
+                    </button>
+                    {% endif %}
+                    
+                    {% if current_user.usuario_id == post.usuario_id %}
+                        <a href="{{ url_for('main.editar_posteo', posteo_id=post.posteo_id) }}" 
+                            class="btn btn-info btn-sm me-2">
+                            Editar
+                        </a>
+                    {% endif %}
+                    {% if current_user.usuario_id == post.usuario_id or current_user.rol_id in [1, 2] %}
+                        <form action="{{ url_for('main.eliminar_posteo', posteo_id=post.posteo_id) }}" method="POST" style="display: inline;">
+                            <button type="submit" class="btn btn-danger btn-sm" 
+                                    onclick="return confirm('¿Estás seguro de eliminar este comentario?');">
+                                Eliminar
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if post.replies.all() %}
+                <div class="px-3 pt-2">
+                    {{ render_posteos(post.replies.all()) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endmacro %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Foro de Viajeros</h2>
+    <h2 class="mb-4">Foro de Viajeros 💬</h2>
 
     {% if current_user.is_authenticated and current_user.rol_id == 5 %}
-    <div class="card mb-4">
-        <div class="card-header">
-            Publicar un nuevo comentario
+    <div class="card mb-4" id="reply-form-card">
+        <div class="card-header" id="form-header">
+            Publicar un nuevo posteo
         </div>
         <div class="card-body">
-            <form method="POST" action="{{ url_for('main.foro') }}">
-                <div class="form-group mb-3">
-                    <input type="text" class="form-control" name="titulo" placeholder="Título del Post (Opcional)" maxlength="150">
+            <form method="POST" action="{{ url_for('main.foro') }}" id="comment_form">
+                
+                <input type="hidden" name="parent_id" id="parent_id_input" value="">
+
+                <div class="form-group mb-3" id="titulo-group">
+                    <input type="text" class="form-control" name="titulo" id="titulo-input" placeholder="Título" maxlength="150">
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" name="contenido" rows="3" placeholder="Escribe tu comentario aquí..." required></textarea>
+                    <textarea class="form-control" name="contenido" id="contenido-input" rows="3" placeholder="Escribe tu comentario o respuesta aquí..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Publicar</button>
+                
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="submit" class="btn btn-primary">Publicar</button>
+                    <button type="button" class="btn btn-outline-secondary d-none" id="cancel_reply">
+                        Cancelar Respuesta
+                    </button>
+                </div>
             </form>
         </div>
     </div>
     {% endif %}
 
     <h3 class="mb-3">Comentarios Recientes</h3>
+    
     {% if posteos %}
-        {% for post in posteos %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <p class="card-text">{{ post.contenido }}</p>
-                {% if current_user.usuario_id == post.usuario_id or current_user.rol_id in [1, 2] %}
-                    <a href="{{ url_for('main.editar_posteo', posteo_id=post.posteo_id) }}" 
-                        class="btn btn-info btn-sm float-end me-2">
-                        Editar
-                    </a>
-            
-                    <form action="{{ url_for('main.eliminar_posteo', posteo_id=post.posteo_id) }}" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-danger btn-sm float-end" 
-                                onclick="return confirm('¿Estás seguro de eliminar este comentario?');">
-                            Eliminar
-                        </button>
-                    </form>
-                {% endif %}
-                <footer class="blockquote-footer mt-2">
-                    Publicado por 
-                    <cite title="Autor">{{ post.autor.nombre }} {{ post.autor.apellido }}</cite> 
-                    el {{ post.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}
-                </footer>
-            </div>
-        </div>
-        {% endfor %}
+        {{ render_posteos(posteos) }}
     {% else %}
         <p>Aún no hay comentarios en el foro. ¡Publica vos primero!</p>
     {% endif %}
 
 </div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const parentIdInput = document.getElementById('parent_id_input');
+        const contentInput = document.getElementById('contenido-input');
+        const tituloInputGroup = document.getElementById('titulo-group');
+        const formHeader = document.getElementById('form-header');
+        const cancelReplyButton = document.getElementById('cancel_reply');
+        
+        document.querySelectorAll('.btn-reply').forEach(button => {
+            button.addEventListener('click', function() {
+                const parentId = this.dataset.parentId;
+                const parentAuthor = this.dataset.parentAuthor;
+                
+                // Configurar el formulario para la respuesta
+                parentIdInput.value = parentId;
+                contentInput.value = `@${parentAuthor} `;
+                
+                // indica que se está respondiendo
+                formHeader.textContent = `Respondiendo a ${parentAuthor}`;
+                cancelReplyButton.classList.remove('d-none');
+                tituloInputGroup.style.display = 'none';
+                
+                contentInput.focus();
+                document.getElementById('reply-form-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+        
+        cancelReplyButton.addEventListener('click', function() {
+            parentIdInput.value = '';
+            contentInput.value = '';
+            
+            formHeader.textContent = 'Publicar un nuevo comentario';
+            cancelReplyButton.classList.add('d-none');
+            tituloInputGroup.style.display = 'block';
+        });
+    });
+</script>
 {% endblock %}

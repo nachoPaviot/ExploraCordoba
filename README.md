@@ -1,12 +1,12 @@
 # Descripción
 Aplicación que permite a los usuarios compartir, descubrir y debatir sobre destinos turísticos en la provincia de Córdoba. Orientada a un público ávido por descubrir nuevos destinos deslumbrantes.
-El stack tecnológico esta conformado por el framework Flask, con Python para el backend y Bootstrap, Jinja2, Html, Css, para el frontend. Mientras que los datos se persiten en PostreSQL.
+El stack tecnológico esta conformado por el framework Flask, con Python para el backend y Bootstrap, Jinja2, Html, Css, para el frontend. Mientras que los datos se persisten en PostreSQL.
 
-# Requisitos 
+# Requisitos para correr localmente
 1. **Python 3.8+** instalado en tu sistema
 2. **Postresql** también instalado en el sistema.
 3. **Git** para clonar el repositorio desde GitHub.
-
+4. **Nota:**hay que crear la base de datos. En app/_init_.py hay que colocar las credecniales de la base de datos creada.
 # Configuración inicial
 ### Clonar la aplicacion desde GitHub
 	git clone https://github.com/nachoPaviot/ExploraCordoba.git
@@ -35,7 +35,7 @@ El stack tecnológico esta conformado por el framework Flask, con Python para el
 La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
     
 # Comandos CLI
-**Nota:** *estos comandos sirve para crear las tablas en la base de datos y datos de prueba. Funcionan únicamente cuando se configuran las credenciales en el propio entorno local para acceder a la BD.*
+**Nota:** *estos comandos sirven para crear las tablas en la base de datos y datos de prueba. Funcionan únicamente cuando se configuran las credenciales en el propio entorno local para acceder a la BD.*
 
 ### Crear la base de datos
 	flask crear_db 
