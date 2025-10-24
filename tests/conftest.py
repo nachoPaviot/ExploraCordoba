@@ -5,17 +5,13 @@ from app.models import Rol, Usuario
 from flask_login import current_user
 from flask import url_for, get_flashed_messages
 
-# ----------------------------------------------------
-# FUNCIONES DE UTILIDAD PARA PRUEBAS (NUEVO)
-# ----------------------------------------------------
-
+# FUNCIONES DE UTILIDAD PARA PRUEBAS
 def login_test_user(client, user):
     """
     Simula el inicio de sesión de un usuario de prueba de Flask-Login
     estableciendo directamente la clave '_user_id' en la sesión.
     """
     with client.session_transaction() as sess:
-        # CRUCIAL: Flask-Login usa la clave '_user_id' y espera un string.
         sess['_user_id'] = str(user.usuario_id) 
         
 def logout_test_user(client):
@@ -24,10 +20,7 @@ def logout_test_user(client):
         if '_user_id' in sess:
             del sess['_user_id']
 
-# ----------------------------------------------------
 # FIXTURES DE LA APLICACIÓN
-# ----------------------------------------------------
-
 @pytest.fixture(scope='session')
 def app():
     """Crea y configura una instancia de la aplicación Flask para la sesión de testing."""
@@ -39,11 +32,9 @@ def app():
         db.create_all()
         
         # Inserta datos de prueba (SEEDING)
-        # Nota: Usando 'usuario_id' para la clave primaria.
         rol_turista = Rol(rol_id=5, nombre='Turista', descripcion='Usuario estándar')
         rol_admin = Rol(rol_id=1, nombre='Administrador', descripcion='Acceso total')
         
-        # Simulación de usuarios con la clave primaria 'usuario_id'
         user_turista = Usuario(
             usuario_id=1000, nombre='Test', apellido='Turista', 
             email='turista@test.com', dni='11111111', status='Activo', 
@@ -73,27 +64,21 @@ def client(app):
 def db_session(app):
     """Proporciona la sesión de base de datos para los tests."""
     with app.app_context():
-        # Inicia una transacción para que el test pueda hacer cambios
-        # y luego hacer rollback para limpiar al final.
         connection = db.engine.connect()
         transaction = connection.begin()
-        db.session.begin_nested() # Inicia punto de guardado (savepoint)
+        db.session.begin_nested()
         
         yield db.session
         
         # Limpieza
         db.session.remove()
-        transaction.rollback() # Deshace todos los cambios realizados por el test
+        transaction.rollback()
         connection.close()
 
-# ----------------------------------------------------
 # FIXTURES DE USUARIOS DE PRUEBA
-# ----------------------------------------------------
-
 @pytest.fixture
 def turista_user(app):
     """Retorna el usuario Turista de prueba."""
-    # Necesitas el contexto de la aplicación para que la consulta funcione
     with app.app_context():
         return Usuario.query.filter_by(email='turista@test.com').first()
 

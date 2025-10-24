@@ -6,7 +6,7 @@ El stack tecnológico esta conformado por el framework Flask, con Python para el
 1. **Python 3.8+** instalado en tu sistema
 2. **Postresql** también instalado en el sistema.
 3. **Git** para clonar el repositorio desde GitHub.
-4. **Nota:**hay que crear la base de datos. En app/_init_.py hay que colocar las credecniales de la base de datos creada.
+4. **Nota:** hay que crear la base de datos. En app/_init_.py hay que colocar las credecniales de la base de datos creada.
 # Configuración inicial
 ### Clonar la aplicacion desde GitHub
 	git clone https://github.com/nachoPaviot/ExploraCordoba.git
