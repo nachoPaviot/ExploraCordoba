@@ -1,6 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required
-from werkzeug.exceptions import abort
 from app.utils import admin_required
 from app.models import Cotizacion, Usuario, Rol
 from app.extensions import db, bcrypt

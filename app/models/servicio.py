@@ -12,10 +12,12 @@ class Servicio(db.Model):
     
     # Clave Foránea a Destino
     destino_id = db.Column(db.Integer, db.ForeignKey('destino.destino_id'), nullable=False)
+    # Clave Foránea a Usuario (Proveedor)
+    proveedor_id = db.Column(db.Integer, db.ForeignKey('usuario.usuario_id'), nullable=False)
     
     # backref 'destino' se define en la clase Destino
     # 'Cotizacion' para evitar errores de forward-reference
     cotizaciones = db.relationship('Cotizacion', backref='servicio_cotizado', lazy=True)
-    
+
     def __repr__(self):
         return f'<Servicio {self.nombre} en Destino ID: {self.destino_id}>'

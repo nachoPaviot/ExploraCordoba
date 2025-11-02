@@ -132,25 +132,6 @@ def register_cli_commands(app):
                     categoria='Alojamiento',
                     endpoint='-31.4167,-64.1833'
                 )
-
-                # 4. Servicios
-                servicio_excursion = Servicio(
-                    servicio_id=1,
-                    nombre='Excursión a Montaña Carbon',
-                    descripcion='Recorrida completa de 3 días.',
-                    precio_base=15000.00,
-                    unidad = 'Persona',
-                    destino_id=1
-                )
-
-                servicio_alojamiento = Servicio(
-                    servicio_id=2,
-                    nombre='Alojamiento en Hotel Overlook',
-                    descripcion='Una estadía muy particular',
-                    precio_base=20000.00,
-                    unidad = 'Noche',
-                    destino_id=2
-                )
                 
                 db.session.add_all([rol_admin,
                                     rol_moderador, 
@@ -160,9 +141,7 @@ def register_cli_commands(app):
                                     user_admin,
                                     user_turista, 
                                     destino_carbon, 
-                                    destino_overlook, 
-                                    servicio_excursion, 
-                                    servicio_alojamiento]) 
+                                    destino_overlook]) 
                 db.session.commit()
 
                 # Reseteo de secuencias en la base de datos
@@ -178,9 +157,7 @@ def register_cli_commands(app):
                     db.session.execute(text(f"SELECT setval('destino_destino_id_seq', {max_destino_id});")) 
 
                 # Para la tabla Servicio
-                max_servicio_id = db.session.query(db.func.max(Servicio.servicio_id)).scalar()
-                if max_servicio_id:
-                    db.session.execute(text(f"SELECT setval('servicio_servicio_id_seq', {max_servicio_id});")) 
+                db.session.execute(text(f"SELECT setval('servicio_servicio_id_seq', 1);")) 
 
                 #Para la tabla Rol
                 max_rol_id = db.session.query(db.func.max(Rol.rol_id)).scalar()

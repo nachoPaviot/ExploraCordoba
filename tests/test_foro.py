@@ -2,7 +2,6 @@ import pytest
 from flask import url_for, get_flashed_messages
 from flask_login import current_user
 from app.models import Usuario, Posteo
-from conftest import login_test_user
 class TestForoRoutes:
     
     # FUNCIÓN CLAVE para corregir el error de url_for
@@ -27,10 +26,10 @@ class TestForoRoutes:
         assert response.status_code == 302
         assert '/login' in response.headers['Location']
 
-    def test_foro_acceso_con_login(self, client, turista_user):
+    def test_foro_acceso_con_login(self, client, turista_user, login_user):
         """Verifica que un usuario Turista logueado pueda acceder a la página del foro."""
         self._setup_url_for_context(client)
-        login_test_user(client, turista_user)
+        login_user(turista_user)
 
         app = client.application
         with app.app_context():
@@ -41,10 +40,10 @@ class TestForoRoutes:
         assert response.status_code == 200
         assert b'<!DOCTYPE html>' in response.data 
 
-    def test_solo_turista_puede_postear(self, client, admin_user):
+    def test_solo_turista_puede_postear(self, client, admin_user, login_user):
         """Verifica que un usuario Admin NO pueda publicar un posteo (se espera un flash de error)."""
         self._setup_url_for_context(client)
-        login_test_user(client, admin_user) 
+        login_user(admin_user)
 
         app = client.application
         with app.app_context():
@@ -64,12 +63,11 @@ class TestForoRoutes:
             post = Posteo.query.filter_by(titulo=data['titulo']).first()
             assert post is None, "El posteo del Admin se creó indebidamente."
 
-    def test_turista_crea_posteo_exito(self, client, turista_user, db_session):
+    def test_turista_crea_posteo_exito(self, client, turista_user, db_session, login_user):
         """Verifica que un usuario Turista pueda crear un posteo exitosamente."""
-        
         # Configuración inicial de datos de prueba
         self._setup_url_for_context(client)
-        login_test_user(client, turista_user) 
+        login_user(turista_user) 
 
         app = client.application
         with app.app_context():
@@ -80,14 +78,14 @@ class TestForoRoutes:
         # Ejecución de la prueba
         response = client.post(foro_url, data=data, follow_redirects=True)
 
-        # Verificación de resultados
+        # Verificar Aserción 1: Respuesta exitosa
         assert response.status_code == 200
 
-        expected_message_bytes = 'Comentario publicado con éxito'.encode('utf-8')
-        
+        # Aserción 2: El mensaje de éxito debe estar en el HTML renderizado.
         assert b'Comentario publicado' in response.data, \
              f"El mensaje de éxito esperado ('Comentario publicado con éxito') no se encontró en el HTML."
         
+        # Aserción 3 (DB CHECK): Verificar que el posteo SÍ se creó en la DB
         with app.app_context():
             post = Posteo.query.filter_by(titulo=data['titulo']).first()
             assert post is not None, "El posteo no se encontró en la base de datos."

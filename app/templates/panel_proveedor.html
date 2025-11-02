@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Panel de Proveedor{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1 class="page-title">Panel de Proveedor</h1>
+        <a href="{{ url_for('main.crear_servicio') }}" class="btn btn-primary">
+            <span class="icon-plus">+</span> Registrar Nuevo Servicio
+        </a>
+    </div>
+
+    <h2 class="section-title">Mis Servicios Registrados ({{ servicios_propios|length if servicios_propios else 0 }})</h2>
+    
+    {% if servicios_propios %}
+        <div class="service-list">
+            {% for servicio in servicios_propios %}
+                <div class="service-card">
+                    
+                    <div class="service-info">
+                        <h3 class="service-name">{{ servicio.nombre }}</h3>
+                        <p class="service-detail">
+                            Precio: <span class="price-value">${{ "{:,.2f}".format(servicio.precio_base) }}</span> por {{ servicio.unidad }}
+                        </p>
+                        <p class="service-detail">
+                            Destino: 
+                            {% if servicio.destino %}
+                                <span class="destination-name">{{ servicio.destino.nombre }}</span>
+                            {% else %}
+                                <span class="destination-missing">Sin destino asociado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="service-actions">
+                        <span class="status-badge status-{{ servicio.status|lower }}">
+                            {{ servicio.status }}
+                        </span>
+                        
+                        <a href="{{ url_for('main.editar_servicio', servicio_id=servicio.servicio_id) }}" class="btn btn-icon btn-edit" title="Editar">
+                            Editar
+                        </a>
+                        
+                        <form method="POST" action="{{ url_for('main.eliminar_servicio', servicio_id=servicio.servicio_id) }}" onsubmit="return confirm('¿Estás seguro de que quieres pausar/eliminar este servicio?');" class="inline-form">
+                            <button type="submit" class="btn btn-icon btn-delete" title="Eliminar/Pausar">
+                                Pausar/Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"></div>
+            <p class="empty-message">
+                Aún no has registrado ningún servicio. Crea el primero para empezar a recibir cotizaciones.
+            </p>
+            <div class="empty-action">
+                 <a href="{{ url_for('main.crear_servicio') }}" class="btn btn-success">
+                    <span class="icon-plus">+</span> Registrar Mi Primer Servicio
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
