@@ -31,6 +31,11 @@
                             <a class="nav-link" href="{{ url_for('main.admin_panel') }}">Panel de Admin</a>
                         </li>
                         {% endif %}
+                        {% if current_user.rol_id == 4 %} 
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.proveedor_panel') }}">Panel de Proveedor</a>
+                        </li>
+                        {% endif %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.logout') }}">Cerrar Sesión</a>
                         </li>

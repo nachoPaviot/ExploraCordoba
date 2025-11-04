@@ -3,7 +3,12 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Cotizador de Servicios Turísticos</h2>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Cotizador de Servicios Turísticos</h2>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+            ← Volver al Inicio
+        </a>
+    </div>
     <hr>
     
     <div class="row">

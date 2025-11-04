@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
 from datetime import datetime
-from app.utils import db, post_permission_required
+from app.utils import db, posteo_permisos_required
 from app.models import Posteo
 from . import main
 
@@ -25,8 +25,8 @@ def foro():
         posteo_padre_id = int(posteo_padre_id_str) if posteo_padre_id_str and posteo_padre_id_str.isdigit() else None
 
         
-        if not contenido or len(contenido.strip()) < 25:
-            flash('El comentario debe ser de al menos 25 carácteres.', 'danger')
+        if not contenido or len(contenido.strip()) < 5:
+            flash('El comentario debe ser de al menos 5 carácteres.', 'danger')
         else:
             try:
                 # Crea el nuevo posteo
@@ -52,8 +52,8 @@ def foro():
 
 # Ruta para eliminar posteo
 @main.route('/posteo/eliminar/<int:posteo_id>', methods=['POST'])
+@posteo_permisos_required
 @login_required
-@post_permission_required
 def eliminar_posteo(posteo_id, posteo):
     
     try:
@@ -68,16 +68,16 @@ def eliminar_posteo(posteo_id, posteo):
 
 # Ruta para editar posteos
 @main.route('/posteo/editar/<int:posteo_id>', methods=['GET', 'POST'])
+@posteo_permisos_required
 @login_required
-@post_permission_required
 def editar_posteo(posteo_id, posteo):
     
     if request.method == 'POST':
         nuevo_contenido = request.form.get('contenido')
         nuevo_titulo = request.form.get('titulo')
         
-        if not nuevo_contenido or len(nuevo_contenido.strip()) < 25:
-            flash('El comentario debe ser de al menos 25 carácteres.', 'danger')
+        if not nuevo_contenido or len(nuevo_contenido.strip()) < 5:
+            flash('El comentario debe ser de al menos 5 carácteres.', 'danger')
             # renderiza de nuevo para que no pierda los datos por algún error
             return render_template('editar_posteo.html', posteo=posteo, title='Editar Comentario')
             

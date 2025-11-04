@@ -1,3 +1,4 @@
+from datetime import datetime
 from app.extensions import db
 
 class Servicio(db.Model):
@@ -9,7 +10,8 @@ class Servicio(db.Model):
     precio_base = db.Column(db.Float, nullable=False)
     unidad = db.Column(db.String(50)) # Puede ser Persona, Días.
     status = db.Column(db.String(50), default='Disponible')
-    
+    fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
     # Clave Foránea a Destino
     destino_id = db.Column(db.Integer, db.ForeignKey('destino.destino_id'), nullable=False)
     # Clave Foránea a Usuario (Proveedor)
@@ -18,6 +20,7 @@ class Servicio(db.Model):
     # backref 'destino' se define en la clase Destino
     # 'Cotizacion' para evitar errores de forward-reference
     cotizaciones = db.relationship('Cotizacion', backref='servicio_cotizado', lazy=True)
-
+    proveedor = db.relationship('Usuario', backref='servicios_ofrecidos')
+    
     def __repr__(self):
         return f'<Servicio {self.nombre} en Destino ID: {self.destino_id}>'

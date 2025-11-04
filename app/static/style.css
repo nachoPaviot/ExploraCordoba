@@ -38,6 +38,51 @@ body {
     border-color: #d1a400;
 }
 
+.service-actions {
+    display: flex; /* Asegura que los botones estén uno al lado del otro */
+    gap: 10px;    /* Espacio entre los botones */
+    align-items: center;
+}
+
+.btn-icon {
+    /* Estilos base para todos los botones de acción */
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.2s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit {
+    /* Estilo específico para Editar (verde) */
+    background-color: #28a745; /* Bootstrap Success Green */
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #1e7e34;
+}
+
+.btn-delete {
+    /* Estilo específico para Eliminar/Pausar (rojo) */
+    background-color: #dc3545; /* Bootstrap Danger Red */
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #bd2130;
+}
+
+.inline-form {
+    display: inline-block; /* Asegura que el formulario no tome todo el ancho */
+    margin: 0;
+    padding: 0;
+}
+
 .banner-transparente {
     background-color: rgba(248, 249, 250, 0.4); /* 40% de opacidad y 60 transparencia */
     color: #212529; 
@@ -60,3 +105,60 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+.tarjeta-servicio {
+    background-color: rgba(255, 255, 255, 0.6); /* 60% de opacidad y 40 transparencia */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    height: 100%; /* Asegura que todas las tarjetas tengan la misma altura */
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-servicio, 
+.tarjeta-servicio h3, 
+.tarjeta-servicio p {
+    color: #212529; /* Color oscuro para el texto principal */
+}
+
+.nombre-servicio {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.detalles-servicio {
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+}
+
+.campo-descripcion {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.4); /* 40% de opacidad y 60 transparencia */
+    border-radius: 4px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    /* Limitar la altura y ocultar el exceso de texto */
+    max-height: 4.5em; /* 3 líneas de texto aprox */
+    overflow-y: auto;
+    color: #333;
+    word-wrap: break-word; 
+    overflow-wrap: break-word;
+}
+
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 0.25rem;
+    font-weight: bold;
+    display: inline-block;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.status-disponible { background-color: #28a745; }
+.status-pausado { background-color: #ffc107; color: #212529; }
+.status-agotado { background-color: #dc3545; }

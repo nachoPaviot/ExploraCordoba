@@ -12,15 +12,24 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5 mb-5"> 
-    <h1 class="mb-4">Visualización de Destinos en el Mapa</h1>
-    <p>Explora la ubicación de nuestros destinos de turismo alternativo en Córdoba.</p>
+<div class="container mt-5 mb-5">
+    <div class="row align-items-center mb-4">
+        
+        <div class="col-md-9">
+            <h1 class="page-title">Visualización de Destinos en el Mapa</h1>
+            <p>Explora la ubicación de nuestros destinos de turismo alternativo en Córdoba.</p>
+        </div>
+        
+        <div class="col-md-3 text-end">
+            <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+                ← Volver al Inicio
+            </a>
+        </div>
+    </div>
+    <hr>
 
     <div id="mapa" class="shadow"></div>
 
-    <div class="mt-5">
-        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">Volver al Inicio</a>
-    </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 

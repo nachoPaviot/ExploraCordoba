@@ -56,12 +56,33 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">Foro de Viajeros 💬</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Foro de Viajeros 💬</h2>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+            ← Volver al Inicio
+        </a>
+    </div>
+    <hr>
+
+    <h3 class="mb-3">Comentarios Recientes</h3>
+    
+    {% if posteos %}
+        {{ render_posteos(posteos) }}
+    {% else %}
+        <div class="alert alert-info text-center py-4"></div>
+            Aún no hay comentarios en el foro. ¡Publica vos primero!
+        </div>
+    {% endif %}
+
+    <hr class="mt-5 mb-4">
 
     {% if current_user.is_authenticated and current_user.rol_id == 5 %}
-    <div class="card mb-4" id="reply-form-card">
-        <div class="card-header" id="form-header">
-            Publicar un nuevo posteo
+    <h3 class="mb-3">¿Queres compartir algo?</h3>
+
+    <div class="card mb-4 shadow-sm" id="reply-form-card">
+        <div class="card-header bg-primary text-white" id="form-header">
+            Publicar un nuevo comentario
         </div>
         <div class="card-body">
             <form method="POST" action="{{ url_for('main.foro') }}" id="comment_form">
@@ -72,7 +93,7 @@
                     <input type="text" class="form-control" name="titulo" id="titulo-input" placeholder="Título" maxlength="150">
                 </div>
                 <div class="form-group">
-                    <textarea class="form-control" name="contenido" id="contenido-input" rows="3" placeholder="Escribe tu comentario o respuesta aquí..." required></textarea>
+                    <textarea class="form-control" name="contenido" id="contenido-input" rows="3" placeholder="Escribí tu comentario o respuesta aca..." required></textarea>
                 </div>
                 
                 <div class="d-flex justify-content-between mt-3">
@@ -85,15 +106,10 @@
         </div>
     </div>
     {% endif %}
-
-    <h3 class="mb-3">Comentarios Recientes</h3>
     
-    {% if posteos %}
-        {{ render_posteos(posteos) }}
-    {% else %}
-        <p>Aún no hay comentarios en el foro. ¡Publica vos primero!</p>
-    {% endif %}
-
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+            ← Volver al Inicio
+        </a>
 </div>
 {% endblock %}
 
@@ -106,6 +122,14 @@
         const tituloInputGroup = document.getElementById('titulo-group');
         const formHeader = document.getElementById('form-header');
         const cancelReplyButton = document.getElementById('cancel_reply');
+
+        function resetFormToNewPost() {
+            parentIdInput.value = '';
+            contentInput.value = '';
+            formHeader.textContent = 'Publicar un nuevo comentario';
+            cancelReplyButton.classList.add('d-none');
+            tituloInputGroup.style.display = 'block'; 
+        }
         
         document.querySelectorAll('.btn-reply').forEach(button => {
             button.addEventListener('click', function() {
@@ -126,14 +150,9 @@
             });
         });
         
-        cancelReplyButton.addEventListener('click', function() {
-            parentIdInput.value = '';
-            contentInput.value = '';
-            
-            formHeader.textContent = 'Publicar un nuevo comentario';
-            cancelReplyButton.classList.add('d-none');
-            tituloInputGroup.style.display = 'block';
-        });
+        cancelReplyButton.addEventListener('click', resetFormToNewPost); 
+          
+        resetFormToNewPost();
     });
 </script>
 {% endblock %}

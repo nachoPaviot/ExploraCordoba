@@ -6,8 +6,8 @@ from app.extensions import db, bcrypt
 from . import main
 
 @main.route('/admin')
-@login_required 
 @admin_required
+@login_required
 def admin_panel():
     # Conseguir las cotizaciones para mostrarlas al admin
     cotizaciones = Cotizacion.query.all()
@@ -17,8 +17,8 @@ def admin_panel():
                            title='Panel de Administración')
 
 @main.route('/admin/crear_usuario', methods=['GET', 'POST'])
-@login_required 
 @admin_required
+@login_required 
 def crear_usuario():
     roles_a_asignar = Rol.query.filter(Rol.nombre.in_(['Administrador', 'Moderador', 'Proveedor', 'Mesa de Ayuda'])).all()
     

@@ -41,14 +41,21 @@ def admin_required(func):
         return func(*args, **kwargs)
     return decorated_view
 
-# Decorador de la librería wraps para verificar permisos sobre un posteo
-def post_permission_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            flash('Necesitas iniciar sesión para gestionar contenido.', 'warning')
-            return abort(403)
+def proveedor_required(func):
+    @wraps(func)
+    def decorated_view(*args, **kwargs):
+        ROL_PROVEEDOR_ID = current_app.config.get('ROL_PROVEEDOR_ID', 4) 
         
+        # Llama a la lógica principal de roles_required
+        if not current_user.is_authenticated or current_user.rol_id != ROL_PROVEEDOR_ID:
+            return abort(403)
+        return func(*args, **kwargs)
+    return decorated_view
+
+# Decorador para verificar permisos de eliminación/edición de posteos
+def posteo_permisos_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
         from .models import Posteo
         # La función de vista debe pasar el objeto Posteo como argumento        
         posteo_id = kwargs.get('posteo_id')
@@ -67,7 +74,7 @@ def post_permission_required(f):
             abort(403)
         kwargs['posteo'] = posteo  # Pasa el posteo para la función decorada   
 
-        return f(*args, **kwargs)
+        return func(*args, **kwargs)
     return decorated_function
 
 # comandos CLI para crear y sembrar la base de datos
