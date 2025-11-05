@@ -19,12 +19,12 @@
                 <div class="mb-3">
                     <label for="servicio" class="form-label">Servicio a Cotizar:</label>
                     <select class="form-select" id="servicio" name="servicio" required>
-                        <option value="" disabled selected>Selecciona un destino y servicio</option>
+                        <option value="" disabled selected>Selecciona un servicio</option>
                         
                         {% for destino in destinos %}
                             <optgroup label="Destino: {{ destino.nombre }}">
                                 {% for servicio in destino.servicios %}
-                                    <option value="{{ servicio.servicio_id }}">
+                                    <option value="{{ servicio.servicio_id }}" data-unidad="{{ servicio.unidad }}">
                                         {{ servicio.nombre }} (Costo: ${{ servicio.costo_base }} por {{ servicio.unidad }})
                                     </option>
                                 {% endfor %}
@@ -40,7 +40,7 @@
                     </div>
                     <div class="col-md-6">
                         <label for="fecha_fin" class="form-label">Fecha de Fin:</label>
-                        <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" required>
+                        <input type="date" class="form-control" id="fecha_fin_input" name="fecha_fin" required>
                     </div>
                 </div>
                 
@@ -67,7 +67,7 @@
                         <p><strong>Personas:</strong> {{ cotizacion_resultado.personas }}</p>
                         <hr>
                         <h4>Costo Total Estimado: <span class="text-primary">${{ "{:,.2f}".format(cotizacion_resultado.total) }}</span></h4>
-                        <p class="text-muted small mt-2">Cotización guardada como "{{ cotizacion_resultado.estado }}".</p>
+                        <p class="text-muted small mt-2">Estado de la Reserva: {{ cotizacion_resultado.estado }}.</p>
                     {% endif %}
                 </div>
             {% else %}
@@ -76,4 +76,62 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const servicioSelect = document.getElementById('servicio');
+        const fechaInicioInput = document.getElementById('fecha_inicio');
+        const fechaFinGroup = document.getElementById('fecha-fin-group');
+        const fechaFinInput = document.getElementById('fecha_fin_input');
+
+        // Unidades que NO requieren fecha de fin (una sola ocurrencia/día)
+        const UNIDADES_DE_UN_DIA = ['Persona', 'Unidad']; 
+
+        function toggleFechaFin() {
+            const selectedOption = servicioSelect.options[servicioSelect.selectedIndex];
+            if (!selectedOption || selectedOption.value === "") {
+                // Si no hay selección, el campo de fecha fin sigue activo
+                fechaFinInput.removeAttribute('readonly');
+                fechaFinInput.classList.remove('bg-light');
+                fechaFinInput.setAttribute('required', 'required');
+                return;
+            } 
+
+            const unidad = selectedOption.dataset.unidad;
+            const isSingleDayUnit = UNIDADES_DE_UN_DIA.includes(unidad);
+
+            if (isSingleDayUnit) {
+                // DESHABILITAR y GRISAR
+                fechaFinInput.setAttribute('readonly', 'readonly');
+                fechaFinInput.classList.add('bg-light'); // Aplica el estilo grisado de Bootstrap
+                fechaFinInput.removeAttribute('required'); 
+
+                // Sincroniza la fecha de fin con la de inicio
+                if (fechaInicioInput.value) {
+                    fechaFinInput.value = fechaInicioInput.value;
+                }
+            } else {
+                // Queda habilitado el selector de fecha fin
+                fechaFinInput.removeAttribute('readonly');
+                fechaFinInput.classList.remove('bg-light');
+                fechaFinInput.setAttribute('required', 'required');
+            }
+        }
+        //Si el servicio cambia, ajustar fecha fin
+        servicioSelect.addEventListener('change', toggleFechaFin);
+ 
+
+        // Si fecha de inicio cambia y fecha fin está deshabilitada, sincronizar
+        fechaInicioInput.addEventListener('change', function() {
+            if (fechaFinInput.hasAttribute('readonly')) {
+                fechaFinInput.value = fechaInicioInput.value;
+            }
+        });
+        
+        //Cargar la página para ajustar el estado inicial
+        setTimeout(toggleFechaFin, 10);
+    });
+</script>
 {% endblock %}

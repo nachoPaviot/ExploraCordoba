@@ -39,12 +39,12 @@ def cotizador():
                 dias = (fecha_fin - fecha_inicio).days + 1
                 
                 # Calculo: Costo Base * Personas * días
-                if servicio_seleccionado.unidad == 'Noche':
+                if servicio_seleccionado.unidad == 'Día':
                     costo = servicio_seleccionado.precio_base * cantidad_personas * dias
                 elif servicio_seleccionado.unidad == 'Persona':
                     costo = servicio_seleccionado.precio_base * cantidad_personas
                 else:
-                    costo = servicio_seleccionado.precio_base * cantidad_personas # Por defecto
+                    costo = servicio_seleccionado.precio_base * cantidad_personas
 
                 # Guarda la cotización en la DB
                 nueva_cotizacion = Cotizacion(
@@ -67,7 +67,8 @@ def cotizador():
                     'total': costo,
                     'personas': cantidad_personas,
                     'dias': dias,
-                    'costo_base': servicio_seleccionado.precio_base
+                    'costo_base': servicio_seleccionado.precio_base,
+                    'estado': nueva_cotizacion.estado
                 }
 
         except Exception as e:
