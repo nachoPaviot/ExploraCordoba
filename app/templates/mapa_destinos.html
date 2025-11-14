@@ -62,8 +62,8 @@
         let lat = null;
         let lon = null;
         
-        if (destino.endpoint && typeof destino.endpoint === 'string') {
-            const coords = destino.endpoint.split(',');
+        if (destino.coordenadas && typeof destino.coordenadas === 'string') {
+            const coords = destino.coordenadas.split(',');
             lat = parseFloat(coords[0]);
             lon = parseFloat(coords[1]);
         } 

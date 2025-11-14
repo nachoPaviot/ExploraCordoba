@@ -10,6 +10,57 @@
         </a>
     </div>
 
+    <h2 class="section-title">Reservas Pendientes ({{ reservas_pendientes|length if reservas_pendientes else 0 }})</h2>
+    
+    {% if reservas_pendientes %}
+        <div class="reservas-list mb-5">
+            {% for reserva in reservas_pendientes %}
+            <div class="tarjeta-reserva alert alert-warning d-flex justify-content-between align-items-start p-3 mb-3">
+                
+                <div class="reserva-info flex-grow-1 me-3">
+                    <h4 class="h5 mb-1 fw-bold">Solicitud de Reserva #{{ reserva.reserva_id }}</h4>
+                    <p class="mb-1">
+                        Servicio: <strong class="text-primary">{{ reserva.servicio_reservado.nombre }}</strong> en {{ reserva.servicio_reservado.destino.nombre }}
+                    </p>
+                    <p class="mb-1">
+                        Cliente: <strong>{{ reserva.turista.email }}</strong>
+                    </p>
+                    <p class="mb-1">
+                        Fechas: {{ reserva.fecha_servicio_inicio.strftime('%d/%m/%Y') }} hasta {{ reserva.fecha_servicio_fin.strftime('%d/%m/%Y') }} | Personas: {{ reserva.cantidad_personas }}
+                    </p>
+                    <p class="mb-0">
+                        Total Cotizado: <strong class="text-success">${{ "{:,.2f}".format(reserva.costo_total) }}</strong>
+                    </p>
+                </div>
+                
+                <div class="reserva-actions d-flex flex-column gap-2">
+                    {% if reserva.estado == 'Pendiente' %}
+                    <form method="POST" action="{{ url_for('main.aceptar_reserva', reserva_id=reserva.reserva_id) }}" class="inline-form">
+                        <button type="submit" class="btn btn-success btn-sm w-100">
+                            Aceptar
+                        </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('main.rechazar_reserva', reserva_id=reserva.reserva_id) }}" class="inline-form">
+                        <button type="submit" class="btn btn-danger btn-sm w-100">
+                            Rechazar
+                        </button>
+                    </form>
+                    {% else %}
+                        <span class="badge bg-secondary">{{ reserva.estado }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mb-5">
+            <div class="empty-icon text-secondary">No hay solicitudes</div>
+            <p class="empty-message">
+                No tienes reservas pendientes en este momento.
+            </p>
+        </div>
+    {% endif %}
+
     <h2 class="section-title">Mis Servicios Registrados ({{ servicios_propios|length if servicios_propios else 0 }})</h2>
     
     {% if servicios_propios %}

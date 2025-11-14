@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                        {% if current_user.rol_id == 5 %} 
+                        {% if current_user.rol_id == 1, 5 %} 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.mapa_destinos') }}">Mapa de Destinos</a>
                         </li>

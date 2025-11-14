@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">Editar Destino: {{ destino.nombre }}</h1>
+            <p class="text-muted">Modifica los detalles del destino y guarda los cambios.</p>
+            <hr>
+
+            <div class="card shadow-lg mb-4">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.editar_destino', destino_id=destino.destino_id) }}">
+                        
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre del Destino</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" 
+                                   value="{{ form_data.nombre }}" required maxlength="100">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" required>{{ form_data.descripcion }}</textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="categoria" name="categoria" 
+                                   value="{{ form_data.categoria }}" required maxlength="50" placeholder="Ej: Aventura, Relax, Cultural">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="coordenadas" class="form-label">Coordenadas (Latitud, Longitud)</label>
+                            <input type="text" class="form-control" id="coordenadas" name="coordenadas" 
+                                   value="{{ form_data.coordenadas or '' }}" maxlength="50" 
+                                   placeholder="Ej: -31.3962,-64.1873">
+                            <div class="form-text">
+                                Formato: latitud,longitud. Obligatorio si quieres que aparezca en el mapa.
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('main.admin_panel') }}" class="btn btn-outline-secondary">
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

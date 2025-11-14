@@ -35,7 +35,7 @@
                     {% if current_user.is_authenticated and current_user.rol_id in [1, 2] %}
                         <span class="btn btn-secondary disabled mt-2" data-bs-toggle="tooltip" title="No disponible para {{ current_user.rol.nombre }}">Sin Acceso</span>
                     {% else %}
-                        <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Cotizador</a>
+                       <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Cotizador</a>
                     {% endif %}
                 </div>
             </div>

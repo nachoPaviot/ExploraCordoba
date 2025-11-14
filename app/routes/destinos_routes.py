@@ -1,6 +1,5 @@
 from flask import render_template
 from flask_login import login_required
-from werkzeug.exceptions import abort
 from app.models import Destino
 from . import main
 

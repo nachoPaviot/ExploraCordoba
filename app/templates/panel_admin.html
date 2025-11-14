@@ -1,59 +1,102 @@
 {% extends "base.html" %}
-{% block title %}Panel de Administración{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Panel de Administración</h2>
-        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
-            ← Volver al Inicio
-        </a>
-    </div>
-    <hr>
+<div class="container mt-4">
+    <h1 class="mb-4">Panel de Administración</h1>
 
-    <h4 class="mb-3">Creación de Usuarios</h4>
-    <div class="mb-4">
-        <a href="{{ url_for('main.crear_usuario') }}" class="btn btn-success">
-            <i class="fas fa-user-plus"></i> Nuevo Usuario
-        </a>
-    </div>
+    <div class="row">
+        <div class="col-md-6 mb-5">
+            <h2 class="h4">Gestión de Usuarios</h2>
+            <a href="{{ url_for('main.crear_usuario') }}" class="btn btn-primary mb-3">Crear Nuevo Usuario</a>
+        </div>
+        
+        <div class="col-12 mb-5">
+            <h2 class="h4">Gestión de Destinos</h2>
+            <a href="{{ url_for('main.crear_destino') }}" class="btn btn-primary mb-3">
+                Crear Nuevo Destino
+            </a>
 
-    <h4 class="mb-3">Cotizaciones Recibidas</h4>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Usuario</th>
-                    <th>Servicio</th>
-                    <th>Fecha Viaje</th>
-                    <th>Personas</th>
-                    <th>Costo Total</th>
-                    <th>Estado</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cotizacion in cotizaciones %}
-                <tr>
-                    <td>{{ cotizacion.cotizacion_id }}</td>
-                    <td>{{ cotizacion.solicitante.nombre }} {{ cotizacion.solicitante.apellido }} ({{ cotizacion.solicitante.email }})</td>
-                    <td>{{ cotizacion.servicio_cotizado.nombre }}</td>
-                    <td>{{ cotizacion.fecha_inicio_viaje.strftime('%d/%m/%Y') }} - {{ cotizacion.fecha_fin_viaje.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ cotizacion.cantidad_personas }}</td>
-                    <td>${{ "{:,.2f}".format(cotizacion.precio_total) }}</td>
-                    <td><span class="badge bg-warning text-dark">{{ cotizacion.estado }}</span></td>
-                </tr>
-                {% else %}
-                <tr>
-                    <td colspan="7">No se encontraron cotizaciones.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+            {% if destinos %}
+            <div class="table-responsive shadow rounded">
+                <table class="table table-hover align-middle bg-white mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Coordenadas</th>
+                            <th style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for destino in destinos %}
+                        <tr>
+                            <td>{{ destino.destino_id }}</td>
+                            <td>{{ destino.nombre }}</td>
+                            <td>{{ destino.categoria }}</td>
+                            <td>{{ destino.coordenadas or 'N/A' }}</td>
+                            <td>
+                                <a href="{{ url_for('main.editar_destino', destino_id=destino.destino_id) }}" class="btn btn-sm btn-info text-white me-2" title="Editar">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ url_for('main.eliminar_destino', destino_id=destino.destino_id) }}" method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger" 
+                                            onclick="return confirm('¿Estás seguro de eliminar el destino {{ destino.nombre }}?')" title="Eliminar">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="alert alert-warning">No hay destinos registrados aún.</p>
+            {% endif %}
+        </div>
 
-    <a href="{{ url_for('main.index') }}" class="btn btn-secondary mb-3">
-            ← Volver al Inicio
-        </a>
+        <div class="col-12 mb-5">
+            <h2 class="h4">Reporte de Reservas</h2>
+            {% if reservas %}
+            <div class="table-responsive shadow rounded">
+                <table class="table table-striped align-middle mb-0">
+                    <thead class="bg-primary text-white">
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Servicio</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in reservas %}
+                        <tr>
+                            <td>{{ r.reserva_id }}</td>
+                            <td>{{ r.cotizacion.solicitante.nombre }} {{ r.cotizacion.solicitante.apellido }}</td>
+                            <td>{{ r.cotizacion.servicio_cotizado.nombre }}</td>
+                            <td>{{ r.cotizacion.fecha_solicitud.strftime('%Y-%m-%d') }}</td>
+                            <td>${{ r.cotizacion.precio_total | round(2) }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if r.estado == 'Pendiente' %}bg-warning text-dark
+                                    {% elif r.estado == 'Aceptada' %}bg-success
+                                    {% elif r.estado == 'Rechazada' %}bg-danger
+                                    {% endif %}">
+                                    {{ r.estado }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="alert alert-warning">No hay reservas registradas aún.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

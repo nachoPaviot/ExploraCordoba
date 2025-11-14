@@ -6,7 +6,7 @@ class Destino(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.Text)
     categoria = db.Column(db.String(50))
-    endpoint = db.Column(db.String(50), nullable=True) # Para datos de geolocalización
+    coordenadas = db.Column(db.String(50), nullable=False) # Para la geolocalización
 
     # Método de serialización a diccionario
     def to_dict(self):
@@ -15,7 +15,7 @@ class Destino(db.Model):
             'id': self.destino_id,
             'nombre': self.nombre,
             'descripcion': self.descripcion,
-            'endpoint': self.endpoint, # Para las coordenadas
+            'coordenadas': self.coordenadas,
             'categoria': self.categoria 
         }
 

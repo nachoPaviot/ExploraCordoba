@@ -13,9 +13,10 @@ class Usuario(db.Model, UserMixin):
     
     # FK
     rol_id = db.Column(db.Integer, db.ForeignKey('rol.rol_id'), nullable=False)
-    
+     
     # Relaciones
     cotizaciones = db.relationship('Cotizacion', backref='solicitante', lazy=True)
+    reservas = db.relationship('Reserva', backref='turista', lazy=True) 
 
     # Requerido por Flask-Login para el ID
     def get_id(self):

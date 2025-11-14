@@ -8,7 +8,7 @@ class Servicio(db.Model):
     nombre = db.Column(db.String(100), nullable=False)
     descripcion = db.Column(db.String(255))
     precio_base = db.Column(db.Float, nullable=False)
-    unidad = db.Column(db.String(50)) # Puede ser Persona, Días.
+    unidad = db.Column(db.String(50))
     status = db.Column(db.String(50), default='Disponible')
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
@@ -21,6 +21,7 @@ class Servicio(db.Model):
     # 'Cotizacion' para evitar errores de forward-reference
     cotizaciones = db.relationship('Cotizacion', backref='servicio_cotizado', lazy=True)
     proveedor = db.relationship('Usuario', backref='servicios_ofrecidos')
-    
+    reservas = db.relationship('Reserva', backref='servicio_reservado', lazy=True)
+
     def __repr__(self):
         return f'<Servicio {self.nombre} en Destino ID: {self.destino_id}>'

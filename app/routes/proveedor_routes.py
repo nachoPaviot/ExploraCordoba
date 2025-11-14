@@ -1,8 +1,9 @@
 from flask import render_template, redirect, url_for, flash, request
 from app.utils import proveedor_required
 from app.extensions import db 
-from app.models import Destino, Servicio
-from flask_login import login_required, current_user 
+from app.models import Destino, Servicio, Usuario, Reserva
+from flask_login import login_required, current_user
+from sqlalchemy.orm import joinedload
 from . import main
 
 UNIDADES_DISPONIBLES = ['Día', 'Persona', 'Unidad']
@@ -12,17 +13,35 @@ UNIDADES_DISPONIBLES = ['Día', 'Persona', 'Unidad']
 @login_required
 def proveedor_panel():
     servicios_propios = []
+    reservas_pendientes = []
+
     try:        
         servicios_propios = Servicio.query.filter_by(proveedor_id=current_user.usuario_id).all()
+
+        # Obtener los IDs de los servicios propios
+        servicio_ids = [s.servicio_id for s in servicios_propios]
+        
+        # 2. Cargar las reservas pendientes para esos servicios
+        if servicio_ids:
+            reservas_pendientes = Reserva.query.filter(
+                Reserva.servicio_id.in_(servicio_ids),
+                Reserva.estado == 'Pendiente'
+            ).options(
+                joinedload(Reserva.servicio_reservado).joinedload(Servicio.destino), # Pre-cargar Servicio y Destino
+                joinedload(Reserva.turista) # Pre-cargar el usuario que hizo la reserva
+            ).all()
+
     except Exception as e:
         flash('Error al cargar la lista de tus servicios.', 'danger')
         print(f"Database Error fetching Provider Services: {e}")
 
     return render_template('panel_proveedor.html', 
                            title='Panel de Proveedor',
-                           servicios_propios=servicios_propios)
+                           servicios_propios=servicios_propios,
+                           reservas_pendientes=reservas_pendientes
+                    )
 
-@main.route('/proveedor/crear/servicio', methods=['GET', 'POST'])
+@main.route('/proveedor/crear_servicio', methods=['GET', 'POST'])
 @proveedor_required
 @login_required
 def crear_servicio():
@@ -58,7 +77,7 @@ def crear_servicio():
                 flash('Destino seleccionado inválido.', 'danger')
                 return redirect(url_for('main.crear_servicio'))
 
-            new_servicio = Servicio(
+            nuevo_servicio = Servicio(
                 nombre=nombre,
                 descripcion=descripcion,
                 precio_base=precio_base,
@@ -68,10 +87,10 @@ def crear_servicio():
                 proveedor_id=current_user.usuario_id 
             )
             
-            db.session.add(new_servicio)
+            db.session.add(nuevo_servicio)
             db.session.commit()
             
-            flash(f'¡Servicio "{new_servicio.nombre}" registrado exitosamente!', 'success')
+            flash(f'¡Servicio "{nuevo_servicio.nombre}" registrado exitosamente!', 'success')
             return redirect(url_for('main.crear_servicio'))
 
         except ValueError:
@@ -95,7 +114,7 @@ def crear_servicio():
                            unidades=UNIDADES_DISPONIBLES
                            )
 
-@main.route('/proveedor/editar/servicio/<int:servicio_id>', methods=['GET', 'POST'])
+@main.route('/proveedor/editar_servicio/<int:servicio_id>', methods=['GET', 'POST'])
 @proveedor_required
 @login_required
 def editar_servicio(servicio_id):
@@ -156,7 +175,7 @@ def editar_servicio(servicio_id):
                            )
 
 
-@main.route('/proveedor/eliminar/servicios/<int:servicio_id>', methods=['POST'])
+@main.route('/proveedor/eliminar_servicio/<int:servicio_id>', methods=['POST'])
 @proveedor_required
 @login_required
 def eliminar_servicio(servicio_id):
@@ -171,5 +190,53 @@ def eliminar_servicio(servicio_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Ocurrió un error al intentar eliminar el servicio: {e}', 'danger')
+
+    return redirect(url_for('main.proveedor_panel'))
+
+@main.route('/proveedor/aceptar_reserva/<int:reserva_id>', methods=['POST'])
+@proveedor_required
+@login_required
+def aceptar_reserva(reserva_id):
+    """Permite al proveedor aceptar una reserva pendiente."""
+    # Cargamos la reserva y el servicio asociado
+    reserva = Reserva.query.options(joinedload(Reserva.servicio_reservado)).get_or_404(reserva_id)
+
+    # Solo se puede modificar si está pendiente
+    if reserva.estado != 'Pendiente':
+        flash(f'La reserva ya tiene el estado "{reserva.estado}" y no puede ser aceptada.', 'warning')
+        return redirect(url_for('main.proveedor_panel'))
+
+    try:
+        reserva.estado = 'Aceptada'
+        db.session.commit()
+        flash('Reserva aceptada exitosamente.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al aceptar la reserva: {e}', 'danger')
+        print(f"Error al actualizar la reserva a Aceptada: {e}")
+
+    return redirect(url_for('main.proveedor_panel'))
+
+
+@main.route('/proveedor/rechazar_reserva/<int:reserva_id>', methods=['POST'])
+@proveedor_required
+@login_required
+def rechazar_reserva(reserva_id):
+    # Cargamos la reserva y el servicio asociado
+    reserva = Reserva.query.options(joinedload(Reserva.servicio_reservado)).get_or_404(reserva_id)
+    
+    # 2. Validación de Estado
+    if reserva.estado != 'Pendiente':
+        flash(f'La reserva ya tiene el estado "{reserva.estado}" y no puede ser rechazada.', 'warning')
+        return redirect(url_for('main.proveedor_panel'))
+
+    try:
+        reserva.estado = 'Rechazada'
+        db.session.commit()
+        flash('Reserva rechazada.', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error al rechazar la reserva: {e}', 'danger')
+        print(f"Error al actualizar la reserva a Rechazada: {e}")
 
     return redirect(url_for('main.proveedor_panel'))

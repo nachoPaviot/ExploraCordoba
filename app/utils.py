@@ -130,14 +130,14 @@ def register_cli_commands(app):
                     nombre='Montaña Carbón', 
                     descripcion='Montañas para trekking.',
                     categoria='Aventura',
-                    endpoint='-31.3200,-64.5500'
+                    coordenadas='-31.3200,-64.5500'
                 )
                 destino_overlook = Destino(
                     destino_id=2,
                     nombre='Hotel Overlook',
                     descripcion='Hotel donde ocurren extrañas situaciones.',
                     categoria='Alojamiento',
-                    endpoint='-31.4167,-64.1833'
+                    coordenadas='-31.4167,-64.1833'
                 )
                 
                 db.session.add_all([rol_admin,

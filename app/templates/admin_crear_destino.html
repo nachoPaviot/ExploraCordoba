@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Crear Nuevo Destino 🌍</h2>
+        <a href="{{ url_for('main.admin_panel') }}" class="btn btn-secondary">
+            ← Volver al Panel
+        </a>
+    </div>
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg p-4">
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('main.crear_destino') }}">
+                        
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label fw-bold">Nombre del Destino</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nombre" 
+                                   name="nombre" 
+                                   value="{{ form_data.nombre }}" 
+                                   required 
+                                   maxlength="100"
+                                   placeholder="El destino...">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label fw-bold">Descripción</label>
+                            <textarea class="form-control" 
+                                      id="descripcion" 
+                                      name="descripcion" 
+                                      rows="4" 
+                                      required
+                                      placeholder="Una breve descripción sobre este destino turístico.">{{ form_data.descripcion }}</textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="categoria" 
+                                   name="categoria" 
+                                   value="{{ form_data.categoria }}"
+                                   placeholder="Ej: montaña, playa, refugio, etc.">
+                            <div class="form-text">Clasificación del destino (aventura, alojamiento, productos).</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="coordenadas" class="form-label">Coordenadas de Geolocalización</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="coordenadas" 
+                                   name="coordenadas" 
+                                   value="{{ form_data.coordenadas }}"
+                                   placeholder="Ej: -34.6037,-58.3816 (Latitud, Longitud)">
+                            <div class="form-text">Datos de coordenadas geográfica.</div>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Crear Destino</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
