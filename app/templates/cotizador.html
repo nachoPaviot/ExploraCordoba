@@ -18,19 +18,30 @@
                 
                 <div class="mb-3">
                     <label for="servicio" class="form-label">Servicio a Cotizar:</label>
-                    <select class="form-select" id="servicio" name="servicio" required>
+
+                    {% if servicio_precargado %}
+                        <div class="alert alert-primary p-3 shadow-sm">
+                            <h5 class="mb-1">{{ servicio_precargado.nombre }}</h5>
+                            <small class="text-muted">Destino: <strong>{{ servicio_precargado.destino.nombre }}</strong></small><br>
+                            <span class="text-success small">Costo: ${{ "{:,.2f}".format(servicio_precargado.precio_base) }} por {{ servicio_precargado.unidad }}</span>
+                        </div>
+                        <input type="hidden" name="servicio" id="servicio_precargado_id" value="{{ servicio_precargado.servicio_id }}">
+                        <input type="hidden" id="unidad_precargada" data-unidad="{{ servicio_precargado.unidad }}">
+                    {% else %}
+                        <select class="form-select" id="servicio" name="servicio" required>
                         <option value="" disabled selected>Selecciona un servicio</option>
-                        
-                        {% for destino in destinos %}
-                            <optgroup label="Destino: {{ destino.nombre }}">
-                                {% for servicio in destino.servicios %}
-                                    <option value="{{ servicio.servicio_id }}" data-unidad="{{ servicio.unidad }}">
-                                        {{ servicio.nombre }} (Costo: ${{ servicio.costo_base }} por {{ servicio.unidad }})
-                                    </option>
-                                {% endfor %}
-                            </optgroup>
-                        {% endfor %}
-                    </select>
+                            {% for destino in destinos %}
+                                <optgroup label="Destino: {{ destino.nombre }}">
+                                    {% for servicio in destino.servicios %}
+                                        <option value="{{ servicio.servicio_id }}" data-unidad="{{ servicio.unidad }}"
+                                                {% if request.form.get('servicio')|int == servicio.servicio_id %}selected{% endif %}>
+                                            {{ servicio.nombre }} (Costo: ${{ servicio.costo_base }} por {{ servicio.unidad }})
+                                        </option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
                 </div>
                 
                 <div class="row mb-3">
@@ -63,7 +74,7 @@
                         <h5 class="card-title text-success">Costo Calculado</h5>
                         <p><strong>Destino:</strong> {{ cotizacion_resultado.destino }}</p>
                         <p><strong>Servicio:</strong> {{ cotizacion_resultado.servicio }}</p>
-                        <p><strong>Costo Base:</strong> ${{ cotizacion_resultado.costo_base }} / {{ cotizacion_resultado.dias }} {{ 'días' if cotizacion_resultado.dias > 1 else 'día' }}</p>
+                        <p><strong>Costo Base:</strong> ${{ cotizacion_resultado.precio_base }} / {{ cotizacion_resultado.dias }} {{ 'días' if cotizacion_resultado.dias > 1 else 'día' }}</p>
                         <p><strong>Personas:</strong> {{ cotizacion_resultado.personas }}</p>
                         <hr>
                         <h4>Costo Total Estimado: <span class="text-primary">${{ "{:,.2f}".format(cotizacion_resultado.total) }}</span></h4>
@@ -71,7 +82,7 @@
                         {% if cotizacion_resultado.es_reservable and cotizacion_resultado.estado == 'Pendiente' %}
                             <form method="POST" action="{{ url_for('main.reservar_cotizacion', cotizacion_id=cotizacion_resultado.cotizacion_id) }}" class="mt-3">
                                 <button type="submit" class="btn btn-success btn-lg w-100">
-                                    <i class="bi bi-calendar-check"></i> Reservar Ahora (${{ "{:,.2f}".format(cotizacion_resultado.total) }})
+                                    <i class="bi bi-calendar-check"></i> Reservar por (${{ "{:,.2f}".format(cotizacion_resultado.total) }})
                                 </button>
                             </form>
                         {% elif cotizacion_resultado.estado == 'Aceptada' %}
@@ -90,6 +101,7 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const servicioPrecargado = document.getElementById('servicio_precargado_id');
         const servicioSelect = document.getElementById('servicio');
         const fechaInicioInput = document.getElementById('fecha_inicio');
         const fechaFinInput = document.getElementById('fecha_fin_input');
@@ -98,16 +110,34 @@
         const UNIDADES_DE_UN_DIA = ['Persona', 'Unidad']; 
 
         function toggleFechaFin() {
-            const selectedOption = servicioSelect.options[servicioSelect.selectedIndex];
-            if (!selectedOption || selectedOption.value === "") {
-                // Si no hay selección, el campo de fecha fin sigue activo
-                fechaFinInput.removeAttribute('readonly');
-                fechaFinInput.classList.remove('bg-light');
-                fechaFinInput.setAttribute('required', 'required');
-                return;
-            } 
+            let unidad = null;
 
-            const unidad = selectedOption.dataset.unidad;
+            if (servicioPrecargado) {
+                // Caso 1: Si hay servicio precargado, el selector oculto
+                const unidadInput = document.getElementById('unidad_precargada');
+                if (unidadInput) {
+                    unidad = unidadInput.dataset.unidad;
+                }
+            } else if (servicioSelect) {
+                // Caso 2: hay selector de servicio
+                const selectedOption = servicioSelect.options[servicioSelect.selectedIndex];
+
+                if (!selectedOption || selectedOption.value === "") {
+                    // Si no hay selección, el campo de fecha fin sigue activo
+                    fechaFinInput.removeAttribute('readonly');
+                    fechaFinInput.classList.remove('bg-light');
+                    fechaFinInput.setAttribute('required', 'required');
+                    if (!fechaFinInput.value) {
+                        fechaFinInput.value = '';
+                    }
+                    return;
+                } 
+                unidad = selectedOption.dataset.unidad;
+            } else {
+                // No hay selector ni precarga
+                return;
+            }
+            
             const isSingleDayUnit = UNIDADES_DE_UN_DIA.includes(unidad);
 
             if (isSingleDayUnit) {
@@ -127,10 +157,12 @@
                 fechaFinInput.setAttribute('required', 'required');
             }
         }
-        //Si el servicio cambia, ajustar fecha fin
-        servicioSelect.addEventListener('change', toggleFechaFin);
- 
 
+        // Manejar el cambio de servicio (solo si no está precargado)
+        if (servicioSelect) {
+            servicioSelect.addEventListener('change', toggleFechaFin);
+        }
+ 
         // Si fecha de inicio cambia y fecha fin está deshabilitada, sincronizar
         fechaInicioInput.addEventListener('change', function() {
             if (fechaFinInput.hasAttribute('readonly')) {
@@ -138,7 +170,6 @@
             }
         });
         
-        //Cargar la página para ajustar el estado inicial
         setTimeout(toggleFechaFin, 10);
     });
 </script>

@@ -34,6 +34,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+    const DESTINO_URL_BASE = "{{ url_for('main.destino_detalle', destino_id=99999).replace('99999', '') }}";
     // Inyectar la variable 'destinos' y corregir el parseo 
     const destinos_json_str = '{{ destinos | tojson | safe }}'; 
     let destinos_data = [];
@@ -61,7 +62,8 @@
     destinos_data.forEach(destino => {
         let lat = null;
         let lon = null;
-        
+        const detalleUrl = DESTINO_URL_BASE + destino.destino_id;
+
         if (destino.coordenadas && typeof destino.coordenadas === 'string') {
             const coords = destino.coordenadas.split(',');
             lat = parseFloat(coords[0]);
@@ -69,9 +71,24 @@
         } 
         
         if (lat && lon && !isNaN(lat) && !isNaN(lon)) {
+            // Construir la URL completa para el detalle de este destino
+            const detalleUrl = DESTINO_URL_BASE + destino.destino_id;
+
+            // Contenido HTML del popup, incluyendo el enlace
+            const popupContent = `
+                <b>${destino.nombre}</b><br>
+                ${destino.descripcion || 'Sin descripción'}<br>
+                <a href="${detalleUrl}">Ver Servicios →</a>
+            `;
+
+
             L.marker([lat, lon])
             .addTo(mapa)
-            .bindPopup(`<b>${destino.nombre}</b><br>${destino.descripcion || 'Sin descripción'}`);
+            .bindPopup(popupContent)
+            .on('click', function (e) {
+                // Abre el popup automáticamente al hacer clic en el marcador
+                e.target.openPopup();
+            });
         } else {
             console.warn(`Destino '${destino.nombre}' omitido: Coordenadas no válidas o faltantes.`);
         }

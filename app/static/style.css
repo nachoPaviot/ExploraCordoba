@@ -162,3 +162,27 @@ body {
 .status-disponible { background-color: #28a745; }
 .status-pausado { background-color: #ffc107; color: #212529; }
 .status-agotado { background-color: #dc3545; }
+
+/* Estiliza el enlace de "Ver Servicios" dentro del popup */
+.leaflet-popup-content a {
+    color: #007bff; 
+    font-weight: bold;
+    text-decoration: none;
+    /* Separador visual para diferenciar el enlace de la descripción */
+    display: block;
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: 1px solid #eee;
+    transition: color 0.2s ease;
+}
+
+.leaflet-popup-content a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.leaflet-popup-content {
+    font-family: inherit;
+    font-size: 14px;
+    color: #333; /* Texto oscuro para asegurar legibilidad sobre fondo blanco */
+}

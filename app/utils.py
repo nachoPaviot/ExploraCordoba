@@ -77,6 +77,14 @@ def posteo_permisos_required(func):
         return func(*args, **kwargs)
     return decorated_function
 
+def calcular_precio_total(servicio, personas: int, dias: int = 1) -> float:
+    total = servicio.precio_base * personas
+
+    if servicio.unidad.lower() in ['día', 'dias']:
+        total = total * dias
+        
+    return total
+
 # comandos CLI para crear y sembrar la base de datos
 def register_cli_commands(app):
     from .models import Rol, Usuario, Destino, Servicio, Cotizacion

@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Servicios en {{ destino.nombre }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="main-content-wrapper p-4">
+
+        <div class="destino-header mb-4 pb-3 border-bottom">
+            <a href="{{ url_for('main.mapa_destinos') }}" class="btn btn-outline-secondary btn-sm mb-3">
+                &larr; Volver al Mapa de Destinos
+            </a>
+            <h1 class="display-6 fw-bold text-primary">{{ destino.nombre }}</h1>
+            <p class="lead text-dark">{{ destino.descripcion or 'Información detallada del destino.' }}</p>
+        </div>
+
+        <h2 class="h4 mb-4 fw-bold">Servicios Disponibles ({{ servicios|length if servicios else 0 }})</h2>
+
+        {% if servicios %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for servicio in servicios %}
+                <div class="col d-flex">
+                    <div class="tarjeta-servicio w-100">
+                        
+                        <span class="status-badge status-disponible">Disponible</span>
+                        
+                        <h3 class="nombre-servicio text-primary">{{ servicio.nombre }}</h3>
+                        
+                        <div class="campo-descripcion">
+                            {{ servicio.descripcion|truncate(150, True) or 'Sin descripción disponible.' }}
+                        </div>
+
+                        <ul class="list-unstyled mb-3 mt-auto">
+                            <li class="detalles-servicio">
+                                <span class="fw-semibold">Precio Base:</span> 
+                                ${{ "{:,.2f}".format(servicio.precio_base) }} por {{ servicio.unidad }}
+                            </li>
+                            <li class="detalles-servicio">
+                                <span class="fw-semibold">Proveedor:</span> 
+                                {{ servicio.proveedor.nombre }}
+                            </li>
+                        </ul>
+
+                        <div class="mt-2">
+                            <a href="{{ url_for('main.cotizador', servicio_id=servicio.servicio_id) }}" 
+                                class="btn btn-custom w-100 fw-bold">
+                                Reservar Servicio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">No hay servicios disponibles aquí.</h4>
+                <p class="mb-0">Aún no se han registrado servicios alternativos y disponibles para este destino.</p>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

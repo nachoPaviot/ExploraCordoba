@@ -3,6 +3,7 @@ from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from app.models import Destino, Servicio, Cotizacion, Reserva
 from app.extensions import db
+from app.utils import calcular_precio_total
 from sqlalchemy.orm import joinedload
 from . import main
 
@@ -12,6 +13,16 @@ def cotizador():
     # Cargar todos los destinos con sus servicios relacionados
     destinos = Destino.query.options(joinedload(Destino.servicios)).all()
     cotizacion_resultado = None
+    
+    servicio_id_url = request.args.get('servicio_id', type=int)
+    servicio_precargado = None
+
+    if servicio_id_url:
+        servicio_precargado = Servicio.query.get(servicio_id_url)
+        if servicio_precargado:
+            flash(f'Cotizando para el servicio seleccionado: "{servicio_precargado.nombre}". Rellena las fechas y personas.', 'info')
+        else:
+            flash('El servicio solicitado para cotización no fue encontrado.', 'warning')
 
     if request.method == 'POST':
         try:
@@ -28,22 +39,14 @@ def cotizador():
                 return render_template('cotizador.html', 
                                        destinos=destinos, 
                                        cotizacion_resultado=cotizacion_resultado,
-                                       title='Cotizador')
+                                       title='Cotizador',
+                                       servicio_precargado=servicio_precargado)
             
-            servicio = Servicio.query.get(servicio_id)
-            if not servicio:
-                flash('Servicio no encontrado.', 'danger')
-                return render_template('cotizador.html', 
-                                       destinos=destinos, 
-                                       cotizacion_resultado=cotizacion_resultado,
-                                       title='Cotizador')
-            
+            servicio = Servicio.query.get_or_404(servicio_id)
+
             dias = (fecha_fin - fecha_inicio).days + 1
 
-            total = servicio.precio_base * personas
-
-            if servicio.unidad.lower() in ['día', 'dias']:
-                total = total * dias
+            total = calcular_precio_total(servicio, personas, dias)
 
             cotizacion = Cotizacion.query.filter_by(
                 usuario_id=current_user.usuario_id,
@@ -97,8 +100,8 @@ def cotizador():
     return render_template('cotizador.html', 
                            destinos=destinos, 
                            cotizacion_resultado=cotizacion_resultado,
-                           title='Cotizador')
-
+                           title='Cotizador',
+                           servicio_precargado=servicio_precargado)
 
 @main.route('/reservar_cotizacion/<int:cotizacion_id>', methods=['POST'])
 @login_required
@@ -126,7 +129,7 @@ def reservar_cotizacion(cotizacion_id):
         db.session.add(nueva_reserva)
         db.session.commit()
         
-        flash('Reserva solicitada exitosamente. Un prestador del servicio revisará tu solicitud.', 'success')
+        flash('Reserva solicitada exitosamente. El prestador del servicio revisará tu solicitud.', 'success')
     
     except Exception as e:
         db.session.rollback()
