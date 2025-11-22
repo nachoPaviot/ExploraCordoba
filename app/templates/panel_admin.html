@@ -2,7 +2,14 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Panel de Administración</h1>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Panel de Administrador</h2>
+        <a href="{{ url_for('main.index') }}" class="btn btn-secondary">
+            ← Volver al Inicio
+        </a>
+    </div>
+    <hr>
 
     <div class="row">
         <div class="col-md-6 mb-5">
@@ -98,5 +105,9 @@
             {% endif %}
         </div>
     </div>
+    
+    <a href="{{ url_for('main.index') }}" class="btn btn-secondary mb-3">
+            ← Volver al Inicio
+    </a>
 </div>
 {% endblock %}

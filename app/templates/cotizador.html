@@ -15,7 +15,6 @@
         <div class="col-md-6">
             <h4 class="mb-3">Seleccione los servicios:</h4>
             <form method="POST" action="{{ url_for('main.cotizador') }}">
-                
                 <div class="mb-3">
                     <label for="servicio" class="form-label">Servicio a Cotizar:</label>
 
@@ -28,36 +27,48 @@
                         <input type="hidden" name="servicio" id="servicio_precargado_id" value="{{ servicio_precargado.servicio_id }}">
                         <input type="hidden" id="unidad_precargada" data-unidad="{{ servicio_precargado.unidad }}">
                     {% else %}
-                        <select class="form-select" id="servicio" name="servicio" required>
-                        <option value="" disabled selected>Selecciona un servicio</option>
+                        <select class="form-select {% if 'servicio' in errores %}is-invalid{% endif %}" id="servicio" name="servicio" required>
+                            <option value="" disabled {% if not form_data.get('servicio') %}selected{% endif %}>Selecciona un servicio</option>
                             {% for destino in destinos %}
                                 <optgroup label="Destino: {{ destino.nombre }}">
                                     {% for servicio in destino.servicios %}
                                         <option value="{{ servicio.servicio_id }}" data-unidad="{{ servicio.unidad }}"
                                                 {% if request.form.get('servicio')|int == servicio.servicio_id %}selected{% endif %}>
-                                            {{ servicio.nombre }} (Costo: ${{ servicio.costo_base }} por {{ servicio.unidad }})
+                                            {{ servicio.nombre }} (Costo: ${{ servicio.precio_base }} por {{ servicio.unidad }})
                                         </option>
                                     {% endfor %}
                                 </optgroup>
                             {% endfor %}
                         </select>
+                        {% if 'servicio' in errores %}
+                            <div class="invalid-feedback">{{ errores.servicio }}</div>
+                        {% endif %}
                     {% endif %}
                 </div>
                 
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="fecha_inicio" class="form-label">Fecha de Inicio:</label>
-                        <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" required>
+                        <input type="date" class="form-control {% if 'fecha_inicio' in errores %}is-invalid{% endif %}" id="fecha_inicio" name="fecha_inicio" value="{{ form_data.get('fecha_inicio', '') }}" required>
+                        {% if 'fecha_inicio' in errores %}
+                            <div class="invalid-feedback">{{ errores.fecha_inicio }}</div>
+                        {% endif %}
                     </div>
                     <div class="col-md-6">
                         <label for="fecha_fin" class="form-label">Fecha de Fin:</label>
-                        <input type="date" class="form-control" id="fecha_fin_input" name="fecha_fin" required>
+                        <input type="date" class="form-control {% if 'fecha_fin' in errores %}is-invalid{% endif %}" id="fecha_fin_input" name="fecha_fin" value="{{ form_data.get('fecha_fin', '') }}" required>
+                        {% if 'fecha_fin' in errores %}
+                            <div class="invalid-feedback">{{ errores.fecha_fin }}</div>
+                        {% endif %}
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="personas" class="form-label">Cantidad de Personas:</label>
-                    <input type="number" class="form-control" id="personas" name="personas" min="1" required>
+                    <input type="number" class="form-control {% if 'personas' in errores %}is-invalid{% endif %}" id="personas" name="personas" min="1" value="{{ form_data.get('personas', '') }}" required>
+                    {% if 'personas' in errores %}
+                        <div class="invalid-feedback">{{ errores.personas }}</div>
+                    {% endif %}
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Cotizar Ahora</button>

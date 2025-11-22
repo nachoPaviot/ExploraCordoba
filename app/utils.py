@@ -3,6 +3,7 @@ from functools import wraps
 from flask import abort, current_app, flash
 from sqlalchemy import text
 from flask_login import current_user
+from datetime import datetime
 
 
 # Función para resetear tablas en PostgreSQL
@@ -85,6 +86,73 @@ def calcular_precio_total(servicio, personas: int, dias: int = 1) -> float:
         
     return total
 
+def validar_datos_cotizacion(form_data):
+    
+    errores = {}
+    datos_validados = {}
+    
+    # Servicio ID
+    servicio_id_str = form_data.get('servicio')
+    if not servicio_id_str:
+        errores['servicio'] = 'Debes seleccionar un servicio.'
+    try:
+        datos_validados['servicio_id'] = int(servicio_id_str)
+    except (ValueError, TypeError):
+        errores['servicio'] = errores.get('servicio', 'Valor de servicio inválido.')
+
+    # Fechas
+    fecha_inicio_str = form_data.get('fecha_inicio')
+    fecha_fin_str = form_data.get('fecha_fin')
+
+    try:
+        datos_validados['fecha_inicio'] = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+    except (ValueError, TypeError):
+        errores['fecha_inicio'] = 'La fecha de inicio es requerida y debe tener formato YYYY-MM-DD.'
+
+    try:
+        if fecha_fin_str:
+            datos_validados['fecha_fin'] = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+        elif 'fecha_inicio' in datos_validados:
+             datos_validados['fecha_fin'] = datos_validados['fecha_inicio']
+        else:
+             errores['fecha_fin'] = 'La fecha de fin es requerida.'
+    except (ValueError, TypeError):
+        errores['fecha_fin'] = 'La fecha de fin es requerida y debe tener formato YYYY-MM-DD.'
+        
+    # Cantidad de Personas
+    personas_str = form_data.get('personas')
+    if not personas_str:
+        errores['personas'] = 'Se requiere la cantidad de personas.'
+    try:
+        datos_validados['personas'] = int(personas_str)
+        if datos_validados['personas'] < 1:
+            errores['personas'] = 'La cantidad debe ser al menos 1.'
+    except (ValueError, TypeError):
+        errores['personas'] = errores.get('personas', 'La cantidad de personas debe ser un número entero.')
+        
+    if 'fecha_inicio' in datos_validados and 'fecha_fin' in datos_validados:
+        if datos_validados['fecha_inicio'] > datos_validados['fecha_fin']:
+            errores['fecha_fin'] = 'La fecha de fin no puede ser anterior a la fecha de inicio.'
+            
+    if errores:
+        return errores, None
+    else:
+        return None, datos_validados
+    
+def validar_coordenadas(coordenadas_str):
+    if ',' not in coordenadas_str:
+        return False
+
+    try:
+        lat_str, lon_str = coordenadas_str.split(',', 1)
+        float(lat_str.strip())
+        float(lon_str.strip())
+        return True
+    except ValueError:
+        return False
+    except Exception:
+        return False
+
 # comandos CLI para crear y sembrar la base de datos
 def register_cli_commands(app):
     from .models import Rol, Usuario, Destino, Servicio, Cotizacion
@@ -114,7 +182,7 @@ def register_cli_commands(app):
                 # 1. Roles 
                 rol_admin = Rol(rol_id=1, nombre='Administrador', descripcion='Acceso total a la administración.')
                 rol_moderador = Rol(rol_id=2, nombre='Moderador', descripcion='Puede gestionar contenidos.')
-                rol_mesa_ayuda = Rol(rol_id=3, nombre='Mesa de Ayuda', descripcion='Atiende consultas y soporte.')
+                rol_mesa_ayuda = Rol(rol_id=3, nombre='Soporte', descripcion='Atiende consultas y soporte.')
                 rol_proveedor = Rol(rol_id=4, nombre='Proveedor', descripcion='Gestiona sus propios servicios.')
                 rol_turista = Rol(rol_id=5, nombre='Turista', descripcion='Usuario estándar que puede ver destinos, servicios, solicitar cotizaciones y participar en el foro.')
                 
@@ -145,7 +213,7 @@ def register_cli_commands(app):
                     nombre='Hotel Overlook',
                     descripcion='Hotel donde ocurren extrañas situaciones.',
                     categoria='Alojamiento',
-                    coordenadas='-31.4167,-64.1833'
+                    coordenadas='-31.781,-64.7005'
                 )
                 
                 db.session.add_all([rol_admin,

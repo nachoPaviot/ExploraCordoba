@@ -18,7 +18,7 @@
                 <div class="card-body">
                     <h5 class="card-title text-primary">Mapa de Destinos 🗺️</h5>
                     <p class="card-text">Encontra tu lugar especial de la provincia...</p>
-                    {% if current_user.is_authenticated and current_user.rol_id in [1, 2] %}
+                    {% if current_user.is_authenticated and current_user.rol_id in [2] %}
                         <span class="btn btn-secondary disabled mt-2" data-bs-toggle="tooltip" title="No disponible para {{ current_user.rol.nombre }}">Sin Acceso</span>
                     {% else %}
                         <a href="{{ url_for('main.mapa_destinos') }}" class="btn btn-outline-primary mt-2">Ir a Destinos</a>
@@ -32,7 +32,7 @@
                 <div class="card-body">
                     <h5 class="card-title text-primary">Cotizador 💲</h5>
                     <p class="card-text">Armá el presupuesto para tu próxima aventura</p>
-                    {% if current_user.is_authenticated and current_user.rol_id in [1, 2] %}
+                    {% if current_user.is_authenticated and current_user.rol_id in [2] %}
                         <span class="btn btn-secondary disabled mt-2" data-bs-toggle="tooltip" title="No disponible para {{ current_user.rol.nombre }}">Sin Acceso</span>
                     {% else %}
                        <a href="{{ url_for('main.cotizador') }}" class="btn btn-outline-primary mt-2">Ir al Cotizador</a>

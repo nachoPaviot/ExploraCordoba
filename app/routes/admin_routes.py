@@ -3,24 +3,8 @@ from flask_login import login_required
 from app.utils import admin_required
 from app.models import Cotizacion, Usuario, Rol, Destino, Reserva
 from app.extensions import db, bcrypt
-from werkzeug.exceptions import abort
+from app.utils import validar_coordenadas
 from . import main
-
-# Función auxiliar para validar el formato de coordenadas
-def validar_coordenadas(coordenadas_str):
-    if ',' not in coordenadas_str:
-        return False
-
-    try:
-        lat_str, lon_str = coordenadas_str.split(',', 1)
-        float(lat_str.strip())
-        float(lon_str.strip())
-        return True
-    except ValueError:
-        return False
-    except Exception:
-        return False
-
 
 @main.route('/admin')
 @admin_required
