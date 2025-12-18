@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% macro render_ticket_table(tickets, id_suffix, current_user_id) %}
+
+<div class="table-container">
+<table class="ticket-table">
+<thead class="table-header">
+<tr>
+<th class="table-cell table-id">ID</th>
+<th class="table-cell table-asunto">Asunto</th>
+<th class="table-cell table-creador">Creador</th>
+<th class="table-cell table-asignado">Asignado A</th>
+<th class="table-cell table-estado">Estado</th>
+<th class="table-cell table-fecha">Última Actualización</th>
+<th class="table-cell table-acciones">Acciones</th>
+</tr>
+</thead>
+<tbody>
+{% for ticket in tickets %}
+<tr class="table-row">
+<td class="table-cell">{{ ticket.ticket_id }}</td>
+<td class="table-cell">{{ ticket.asunto }}</td>
+<td class="table-cell">
+{{ ticket.creador.nombre }}
+</td>
+<td class="table-cell">
+{% if ticket.asignado_a %}
+{% if ticket.asignado_a_id == current_user_id %}
+<span class="asignado-a-mi">ASIGNADO A MÍ</span>
+{% else %}
+{{ ticket.asignado_a.nombre }}
+{% endif %}
+{% else %}
+<span class="sin-asignar">Sin Asignar</span>
+{% endif %}
+</td>
+<td class="table-cell">
+<span class="estado-badge
+{% if ticket.estado == 'Cerrado' %} estado-cerrado
+{% elif ticket.estado == 'Abierto' %} estado-abierto
+{% elif ticket.estado == 'En Progreso' %} estado-progreso
+{% else %} estado-otro
+{% endif %}">
+{{ ticket.estado }}
+</span>
+</td>
+<td class="table-cell table-fecha-cell">{{ ticket.fecha_actualizacion.strftime('%Y-%m-%d %H:%M') }}</td>
+
+            <td class="table-cell table-acciones-cell">
+                
+                <a href="{{ url_for('main.mis_tickets', ticket_id=ticket.ticket_id) }}" class="btn-icon btn-gestionar">Gestionar</a>
+
+                {% if ticket.asignado_a_id != current_user_id %}
+                    <form method="POST" action="{{ url_for('main.asignar_a_mi', ticket_id=ticket.ticket_id) }}" class="form-asignar">
+                        <button type="submit" 
+                            class="btn-icon btn-custom btn-tomar-ticket"
+                            {% if ticket.asignado_a_id is not none %} 
+                                onclick="return confirm('Este ticket ya está asignado a {{ ticket.asignado_a.nombre }}. ¿Deseas reasignártelo?')"
+                            {% endif %}>
+                            {% if ticket.asignado_a_id is none %}
+                                Tomar Ticket
+                            {% else %}
+                                Reasignar
+                            {% endif %}
+                        </button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</div>
+{% endmacro %}
+
+<div class="main-content-wrapper soporte-panel" x-data="{ activeTab: 'activos' }">
+<div class="soporte-header">
+<h1 class="soporte-titulo">Gestión de Tickets</h1>
+<p class="panel-stats">Tickets Activos: <span class="stats-count">{{ tickets_activos|length }}</span></p>
+</div>
+
+<div class="tabs-container">
+    <div class="tabs-nav">
+        <button @click="activeTab = 'activos'"
+            :class="activeTab === 'activos' ? 'tab-boton activo' : 'tab-boton'"
+            class="tab-boton">
+            Tickets Activos ({{ tickets_activos|length }})
+        </button>
+        
+        <button @click="activeTab = 'cerrados'"
+            :class="activeTab === 'cerrados' ? 'tab-boton activo' : 'tab-boton'"
+            class="tab-boton">
+            Tickets Cerrados Recientes ({{ tickets_cerrados|length }})
+        </button>
+    </div>
+
+    <div class="tabs-content">
+        <div x-show="activeTab === 'activos'" style="display: none;">
+            {% if tickets_activos|length > 0 %}
+                {{ render_ticket_table(tickets_activos, 'activos', current_user.usuario_id) }} 
+            {% else %}
+                <div class="no-tickets no-tickets-success">
+                    <p class="no-tickets-title">🎉 ¡No hay tickets pendientes!</p>
+                    <p class="no-tickets-text">Todo el soporte está al día.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div x-show="activeTab === 'cerrados'" style="display: none;">
+            {% if tickets_cerrados|length > 0 %}
+                {{ render_ticket_table(tickets_cerrados, 'cerrados', current_user.usuario_id) }}
+            {% else %}
+                <div class="no-tickets">
+                    <p class="no-tickets-text">No hay tickets cerrados recientemente en la base de datos.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock content %}

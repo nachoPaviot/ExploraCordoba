@@ -1,12 +1,12 @@
 from flask import render_template, redirect, url_for, flash, request
 from app.utils import proveedor_required
 from app.extensions import db 
-from app.models import Destino, Servicio, Usuario, Reserva
+from app.models import Destino, Servicio, Reserva
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
 from . import main
 
-UNIDADES_DISPONIBLES = ['Día', 'Persona', 'Unidad']
+UNIDADES_DISPONIBLES = ['Noche', 'Persona', 'Unidad']
 
 @main.route('/proveedor')
 @proveedor_required

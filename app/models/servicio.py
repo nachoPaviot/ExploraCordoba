@@ -14,7 +14,7 @@ class Servicio(db.Model):
 
     # Clave Foránea a Destino
     destino_id = db.Column(db.Integer, db.ForeignKey('destino.destino_id'), nullable=False)
-    # Clave Foránea a Usuario (Proveedor)
+    # Clave Foránea a Usuario Proveedor
     proveedor_id = db.Column(db.Integer, db.ForeignKey('usuario.usuario_id'), nullable=False)
     
     # backref 'destino' se define en la clase Destino

@@ -13,7 +13,7 @@ def create_app(config_name='development'):
         app.config.from_object(TestingConfig) 
     elif config_name == 'production':
         app.config.from_object(Config)
-    else: # 'development' o cualquier otro valor
+    else:
         app.config.from_object(DevelopmentConfig)
 
     DB_USER = 'postgres'

@@ -5,3 +5,4 @@ from .posteo import Posteo
 from .rol import Rol
 from .servicio import Servicio
 from .reserva import Reserva
+from .ticket import Ticket, RespuestaTicket

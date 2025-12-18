@@ -24,7 +24,7 @@ def admin_panel():
 @admin_required
 @login_required 
 def crear_usuario():
-    roles_a_asignar = Rol.query.filter(Rol.nombre.in_(['Administrador', 'Moderador', 'Proveedor', 'Mesa de Ayuda'])).all()
+    roles_a_asignar = Rol.query.filter(Rol.nombre.in_(['Administrador', 'Moderador', 'Proveedor', 'Soporte'])).all()
     
     form_data = {
         'email': request.form.get('email', ''),

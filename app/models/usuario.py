@@ -16,7 +16,7 @@ class Usuario(db.Model, UserMixin):
      
     # Relaciones
     cotizaciones = db.relationship('Cotizacion', backref='solicitante', lazy=True)
-    reservas = db.relationship('Reserva', backref='turista', lazy=True) 
+    reservas = db.relationship('Reserva', backref='turista', lazy=True)
 
     # Requerido por Flask-Login para el ID
     def get_id(self):

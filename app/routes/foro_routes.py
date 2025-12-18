@@ -3,18 +3,21 @@ from flask_login import login_required, current_user
 from datetime import datetime
 from app.utils import db, posteo_permisos_required
 from app.models import Posteo
+from config import ROL_TURISTA_ID, ROL_PROVEEDOR_ID
 from . import main
 
-# Ruta para ver el foro y el formulario de posteo
 @main.route('/foro', methods=['GET', 'POST'])
 @login_required 
 def foro():
     posteos = Posteo.query.order_by(Posteo.fecha_creacion.desc()).all()
     
     if request.method == 'POST':
-        # Verificar el rol (solo Turistas pueden postear)
-        turista_rol_id = current_app.config.get('ROL_TURISTA_ID', 5)
-        if current_user.rol_id != turista_rol_id:
+        # Verificar el rol (solo Turistas y Proveedores pueden postear)
+        turista_rol_id = current_app.config.get(ROL_TURISTA_ID, 5)
+        proveedor_rol_id = current_app.config.get(ROL_PROVEEDOR_ID, 4)
+        roles_permitidos = [turista_rol_id, proveedor_rol_id]
+    
+        if current_user.rol_id not in roles_permitidos:
             flash('No tenés permiso para postear', 'danger')
             return redirect(url_for('main.foro'))
             
@@ -50,7 +53,6 @@ def foro():
     posteos = Posteo.query.filter_by(posteo_padre_id=None).order_by(Posteo.fecha_creacion.desc()).all()
     return render_template('foro.html', title='Foro de Viajeros', posteos=posteos)
 
-# Ruta para eliminar posteo
 @main.route('/posteo/eliminar/<int:posteo_id>', methods=['POST'])
 @posteo_permisos_required
 @login_required
@@ -66,7 +68,6 @@ def eliminar_posteo(posteo_id, posteo):
 
     return redirect(url_for('main.foro'))
 
-# Ruta para editar posteos
 @main.route('/posteo/editar/<int:posteo_id>', methods=['GET', 'POST'])
 @posteo_permisos_required
 @login_required

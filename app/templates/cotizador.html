@@ -117,8 +117,8 @@
         const fechaInicioInput = document.getElementById('fecha_inicio');
         const fechaFinInput = document.getElementById('fecha_fin_input');
 
-        // Unidades que NO requieren fecha de fin (una sola ocurrencia/día)
-        const UNIDADES_DE_UN_DIA = ['Persona', 'Unidad']; 
+        // Eventos que NO requieren fecha de fin (una sola ocurrencia/día)
+        const EVENTOS_DE_UN_DIA = ['Persona', 'Unidad']; 
 
         function toggleFechaFin() {
             let unidad = null;
@@ -149,7 +149,7 @@
                 return;
             }
             
-            const isSingleDayUnit = UNIDADES_DE_UN_DIA.includes(unidad);
+            const isSingleDayUnit = EVENTOS_DE_UN_DIA.includes(unidad);
 
             if (isSingleDayUnit) {
                 // DESHABILITAR y GRISAR

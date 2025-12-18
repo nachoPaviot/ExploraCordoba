@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Crear Ticket de Soporte{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Crear Nuevo Ticket de Soporte</h2>
+        <a href="{{ url_for('main.mis_tickets') }}" class="btn btn-secondary">
+            ← Ver Tickets
+        </a>
+    </div>
+    <hr>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card p-4 shadow">
+                <form method="POST" action="{{ url_for('main.crear_ticket') }}">
+
+                    <div class="mb-3">
+                        <label for="asunto" class="form-label">Asunto del Ticket:</label>
+                        <input type="text" class="form-control {% if 'asunto' in errores %}is-invalid{% endif %}" 
+                               id="asunto" name="asunto" 
+                               value="{{ form_data.get('asunto', '') }}" 
+                               placeholder="Ej: Problema con la reserva #1234" required>
+                        {% if 'asunto' in errores %}
+                            <div class="invalid-feedback">{{ errores.asunto }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mensaje" class="form-label">Detalle del Mensaje:</label>
+                        <textarea class="form-control {% if 'mensaje' in errores %}is-invalid{% endif %}" 
+                                  id="mensaje" name="mensaje" rows="6" 
+                                  placeholder="Describe tu problema." required>{{ form_data.get('mensaje', '') }}</textarea>
+                        {% if 'mensaje' in errores %}
+                            <div class="invalid-feedback">{{ errores.mensaje }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="text-muted small">Tu ID de usuario es: <strong>{{ current_user.usuario_id }}</strong></p>
+                    
+                    <button type="submit" class="btn btn-success btn-lg mt-3 w-100">
+                        <i class="bi bi-send-fill"></i> Enviar Ticket
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

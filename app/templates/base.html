@@ -15,7 +15,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
-                        {% if current_user.rol_id == 1, 5 %} 
+                        {% if current_user.rol_id in [1, 5] %} 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.mapa_destinos') }}">Mapa de Destinos</a>
                         </li>
@@ -23,9 +23,21 @@
                             <a class="nav-link" href="{{ url_for('main.cotizador') }}">Cotizador</a>
                         </li>
                         {% endif %}
+                        {% if current_user.rol_id in [1, 2, 4, 5] %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.foro') }}">Foro</a>
                         </li>
+                        {% endif %}
+                        {% if current_user.rol_id in [1, 3] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.soporte_panel') }}">Gestión de Tickets</a>
+                        </li>
+                        {% endif %}
+                        {% if current_user.rol_id in [4, 5] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.mis_tickets') }}">Mesa de Ayuda</a>
+                        </li>
+                        {% endif %}
                         {% if current_user.rol_id == 1 %} 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('main.admin_panel') }}">Panel de Admin</a>

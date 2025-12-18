@@ -152,10 +152,30 @@ def validar_coordenadas(coordenadas_str):
         return False
     except Exception:
         return False
+    
+def validar_datos_ticket(form_data):
+    errores = {}
+    datos_validados = {}
+
+    asunto = form_data.get('asunto', '').strip()
+    if not asunto:
+        errores['asunto'] = 'El asunto no puede estar vacío.'
+    elif len(asunto) > 256:
+        errores['asunto'] = 'El asunto es demasiado largo (máximo 256 caracteres).'
+    else:
+        datos_validados['asunto'] = asunto
+
+    mensaje = form_data.get('mensaje', '').strip()
+    if not mensaje:
+        errores['mensaje'] = 'El mensaje no puede estar vacío.'
+    else:
+        datos_validados['mensaje'] = mensaje
+
+    return errores if errores else None, datos_validados
 
 # comandos CLI para crear y sembrar la base de datos
 def register_cli_commands(app):
-    from .models import Rol, Usuario, Destino, Servicio, Cotizacion
+    from .models import Rol, Usuario, Destino, Servicio, Cotizacion, Ticket
     
     #Crea la base de datos y las tablas
     @app.cli.command("crear_db")
@@ -174,7 +194,8 @@ def register_cli_commands(app):
             db.session.query(Servicio).delete()
             db.session.query(Destino).delete()
             db.session.query(Usuario).delete()
-            db.session.query(Rol).delete() 
+            db.session.query(Rol).delete()
+            db.session.query(Ticket).delete()
             db.session.commit()
                         
             try:
@@ -182,7 +203,7 @@ def register_cli_commands(app):
                 # 1. Roles 
                 rol_admin = Rol(rol_id=1, nombre='Administrador', descripcion='Acceso total a la administración.')
                 rol_moderador = Rol(rol_id=2, nombre='Moderador', descripcion='Puede gestionar contenidos.')
-                rol_mesa_ayuda = Rol(rol_id=3, nombre='Soporte', descripcion='Atiende consultas y soporte.')
+                rol_soporte= Rol(rol_id=3, nombre='Soporte', descripcion='Atiende consultas y soporte.')
                 rol_proveedor = Rol(rol_id=4, nombre='Proveedor', descripcion='Gestiona sus propios servicios.')
                 rol_turista = Rol(rol_id=5, nombre='Turista', descripcion='Usuario estándar que puede ver destinos, servicios, solicitar cotizaciones y participar en el foro.')
                 
@@ -218,7 +239,7 @@ def register_cli_commands(app):
                 
                 db.session.add_all([rol_admin,
                                     rol_moderador, 
-                                    rol_mesa_ayuda, 
+                                    rol_soporte, 
                                     rol_proveedor,
                                     rol_turista, 
                                     user_admin,
@@ -245,7 +266,10 @@ def register_cli_commands(app):
                 #Para la tabla Rol
                 max_rol_id = db.session.query(db.func.max(Rol.rol_id)).scalar()
                 if max_rol_id:
-                    db.session.execute(text(f"SELECT setval('rol_rol_id_seq', {max_rol_id});")) 
+                    db.session.execute(text(f"SELECT setval('rol_rol_id_seq', {max_rol_id});"))
+              
+                # Para la tabla Ticket
+                db.session.execute(text(f"SELECT setval('ticket_ticket_id_seq', 1);")) 
 
                 db.session.commit()
                 print("¡Datos iniciales y secuencias insertadas correctamente!")

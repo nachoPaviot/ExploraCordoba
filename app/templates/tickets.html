@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Tickets{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Mis Tickets</h2>
+        <a href="{{ url_for('main.crear_ticket') }}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> Crear Nuevo Ticket
+        </a>
+    </div>
+    <hr>
+    
+    {% if tickets|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle shadow-sm rounded overflow-hidden">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Asunto</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Fecha Creación</th>
+                        <th scope="col">Última Actualización</th>
+                        <th scope="col">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <th scope="row">{{ ticket.ticket_id }}</th>
+                        <td>{{ ticket.asunto }}</td>
+                        <td>
+                            {% if ticket.estado == 'Abierto' %}
+                                <span class="badge bg-danger">Abierto</span>
+                            {% elif ticket.estado == 'En Progreso' %}
+                                <span class="badge bg-warning text-dark">En Progreso</span>
+                            {% else %}
+                                <span class="badge bg-success">Cerrado</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ ticket.fecha_actualizacion.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-info" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#ticketModal{{ ticket.ticket_id }}">
+                                Ver Detalle
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center py-4">
+            No creaste ningún ticket. ¡Estamos listos para ayudarte!
+        </div>
+    {% endif %}
+
+    {% for ticket in tickets %}
+    <div class="modal fade" id="ticketModal{{ ticket.ticket_id }}" tabindex="-1" aria-labelledby="ticketModalLabel{{ ticket.ticket_id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="ticketModalLabel{{ ticket.ticket_id }}">Ticket #{{ ticket.ticket_id }} - {{ ticket.asunto }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-dark">
+                    <p><strong>Estado:</strong> 
+                        {% if ticket.estado == 'Abierto' %}
+                            <span class="badge bg-danger">Abierto</span>
+                        {% elif ticket.estado == 'En Progreso' %}
+                            <span class="badge bg-warning text-dark">En Progreso</span>
+                        {% else %}
+                            <span class="badge bg-success">Cerrado</span>
+                        {% endif %}
+                    </p>
+                    <p><strong>Fecha de Creación:</strong> {{ ticket.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <hr>
+                    <p><strong>Mensaje:</strong></p>
+                    <div class="p-3 bg-light rounded" style="white-space: pre-wrap;">{{ ticket.mensaje }}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
