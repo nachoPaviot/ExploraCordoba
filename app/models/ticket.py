@@ -18,7 +18,8 @@ class Ticket(db.Model):
     # Relaciones
     creador = db.relationship('Usuario', foreign_keys=[usuario_id], backref=db.backref('tickets_creados', lazy='dynamic'))
     asignado_a = db.relationship('Usuario', foreign_keys=[asignado_a_id], backref=db.backref('tickets_asignados', lazy='dynamic'))
-   
+    respuestas = db.relationship('RespuestaTicket', backref='ticket', lazy='dynamic', cascade='all, delete-orphan')
+
     def __repr__(self):
         return f'<Ticket {self.ticket_id}: {self.asunto} ({self.estado})>'
     

@@ -50,7 +50,7 @@
 
             <td class="table-cell table-acciones-cell">
                 
-                <a href="{{ url_for('main.mis_tickets', ticket_id=ticket.ticket_id) }}" class="btn-icon btn-gestionar">Gestionar</a>
+                <a href="{{ url_for('main.detalle_ticket_soporte', ticket_id=ticket.ticket_id) }}" class="btn-icon btn-gestionar">Gestionar</a>
 
                 {% if ticket.asignado_a_id != current_user_id %}
                     <form method="POST" action="{{ url_for('main.asignar_a_mi', ticket_id=ticket.ticket_id) }}" class="form-asignar">
@@ -76,6 +76,12 @@
 </div>
 {% endmacro %}
 
+{% block head %}
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+{% endblock %}
+
 <div class="main-content-wrapper soporte-panel" x-data="{ activeTab: 'activos' }">
 <div class="soporte-header">
 <h1 class="soporte-titulo">Gestión de Tickets</h1>
@@ -98,7 +104,7 @@
     </div>
 
     <div class="tabs-content">
-        <div x-show="activeTab === 'activos'" style="display: none;">
+        <div x-show="activeTab === 'activos'" x-cloak>
             {% if tickets_activos|length > 0 %}
                 {{ render_ticket_table(tickets_activos, 'activos', current_user.usuario_id) }} 
             {% else %}

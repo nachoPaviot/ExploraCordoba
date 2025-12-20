@@ -95,8 +95,7 @@ def detalle_ticket_soporte(ticket_id):
         
     # Cargar el ticket, su creador y todas sus respuestas asociadas
     ticket = Ticket.query.options(
-        joinedload(Ticket.creador),
-        joinedload(Ticket.respuestas).joinedload(RespuestaTicket.usuario)
+        joinedload(Ticket.creador)
     ).filter(Ticket.ticket_id == ticket_id).first_or_404()
 
     # Si es POST, es para enviar una respuesta o cambiar el estado
@@ -131,7 +130,6 @@ def detalle_ticket_soporte(ticket_id):
                 ticket.estado = nuevo_estado
             flash(f'Estado del ticket cambiado a {nuevo_estado}.', 'info')
 
-
             # Actualizar la fecha de actualización si hubo cambios
             ticket.fecha_actualizacion = datetime.utcnow()
             db.session.commit()
@@ -148,8 +146,13 @@ def detalle_ticket_soporte(ticket_id):
         # Aquí se podría poner la lógica de asignación automática, pero lo dejaremos manual (Tomar Ticket)
         pass 
         
-    return render_template('gestion_detalle_ticket.html', 
+    respuestas_lista = ticket.respuestas.options(
+        joinedload(RespuestaTicket.autor)
+    ).order_by(RespuestaTicket.fecha_creacion.asc()).all()
+
+    return render_template('soporte_gestion.html', 
                             ticket=ticket, 
+                            respuestas=respuestas_lista, 
                             estados_disponibles=['Abierto', 'En Progreso', 'Pendiente de Usuario', 'Cerrado'],
                             title=f'Gestionar Ticket #{ticket.ticket_id}')
 
@@ -158,14 +161,14 @@ def detalle_ticket_soporte(ticket_id):
 def asignar_a_mi(ticket_id):
     if current_user.rol_id not in [ROL_ADMIN_ID, ROL_SOPORTE_ID]:
         flash('Acceso denegado. Se requiere rol de Soporte o Administrador.', 'danger')
-        return redirect(url_for('main.panel_soporte'))
+        return redirect(url_for('main.soporte_panel'))
 
     ticket = Ticket.query.get_or_404(ticket_id)
 
     # Solo se puede tomar si está sin asignar o asignado a otro
     if ticket.asignado_a_id is not None and ticket.asignado_a_id == current_user.usuario_id:
         flash('El ticket ya está asignado a ti.', 'info')
-        return redirect(url_for('main.panel_soporte'))
+        return redirect(url_for('main.soporte_panel'))
         
     try:
         # Asignar el ticket al usuario actual
@@ -189,4 +192,4 @@ def asignar_a_mi(ticket_id):
         db.session.rollback()
         flash(f'Ocurrió un error al intentar asignar el ticket: {e}', 'danger')
         
-    return redirect(url_for('main.gestion_tickets'))
+    return redirect(url_for('main.soporte_panel'))
