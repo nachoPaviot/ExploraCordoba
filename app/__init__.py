@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from config import DevelopmentConfig, TestingConfig, Config
 from .utils import register_cli_commands
@@ -5,29 +6,20 @@ from .extensions import db, bcrypt, login_manager, migrate
 from .routes import main as main_blueprint
 
 # crea la Aplicación
-def create_app(config_name='development'):
+def create_app(config_name=None):
     app = Flask(__name__)
     
-    if config_name == 'testing':
-        # Carga la configuración especial para pruebas (SQLite en memoria)
-        app.config.from_object(TestingConfig) 
-    elif config_name == 'production':
-        app.config.from_object(Config)
-    else:
-        app.config.from_object(DevelopmentConfig)
+    if config_name is None:
+        config_name = os.getenv('FLASK_CONFIG', 'development')
 
-    DB_USER = 'postgres'
-    DB_PASSWORD = '1234'
-    DB_HOST = 'localhost'
-    DB_PORT = '5432'
-    DB_NAME = 'exploraCordoba'
+    configs = {
+        'development': DevelopmentConfig,
+        'testing': TestingConfig,
+        'production': Config
+    }
 
-    # Construcción de la URI
-    DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-    # Configuración de la DB
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-    app.config['SECRET_KEY'] = 'PP3_2025'
+    # Cargar la configuración según el entorno
+    app.config.from_object(configs.get(config_name, DevelopmentConfig))
     
     # Inicialización de extensiones
     db.init_app(app)
@@ -35,6 +27,7 @@ def create_app(config_name='development'):
     login_manager.init_app(app)
     migrate.init_app(app, db)
 
+    # Registro de blueprints
     app.register_blueprint(main_blueprint)
     
     # Comandos CLI
