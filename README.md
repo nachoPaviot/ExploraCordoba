@@ -6,7 +6,7 @@ El stack tecnológico esta conformado por el framework Flask, con Python para el
 1. **Python 3.8+** instalado en tu sistema
 2. **Postresql** también instalado en el sistema.
 3. **Git** para clonar el repositorio desde GitHub.
-4. **Nota:** hay que crear la base de datos. En app/_init_.py hay que colocar las credenciales de la base de datos creada.
+4. **Nota:** Debes crear una base de datos vacía en PostgreSQL y configurar tus credenciales mediante un archivo `.env` en la raíz del proyecto.
 # Configuración inicial
 ### Clonar la aplicacion desde GitHub
 	git clone https://github.com/nachoPaviot/ExploraCordoba.git
@@ -35,7 +35,7 @@ El stack tecnológico esta conformado por el framework Flask, con Python para el
 La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
     
 # Comandos CLI
-**Nota:** *estos comandos sirven para crear las tablas en la base de datos y datos de prueba. Funcionan únicamente cuando se configuran las credenciales en el propio entorno local para acceder a la BD.*
+**Nota:** *estos comandos sirven para crear las tablas en la base de datos y sembrar datos de prueba. Funcionan únicamente cuando se configuran las credenciales en el propio entorno local para acceder a la BD.*
 
 ### Crear la base de datos
 	flask crear_db 
@@ -45,4 +45,3 @@ La aplicación estará disponible [aquí](http://127.0.0.1:5000/)
 
 ### Usuarios de prueba
 1. Usuario: ```turista@prueba.com``` Contraseña: ```turista```
-2. Usuario: ```admin@prueba.com``` Contraseña: ```admin```
